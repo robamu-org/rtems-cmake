@@ -38,5 +38,38 @@ target_link_options(${TARGET_NAME} PUBLIC
 	-B${RTEMS_BSP_LIB_PATH}
 )
 
+elseif(RTEMS_BSP STREQUAL "sparc/erc32")
+
+target_compile_options(${TARGET_NAME} PUBLIC
+	-qrtems
+	-B${RTEMS_ARCH_LIB_PATH}
+	-B${RTEMS_BSP_LIB_PATH}
+	--specs bsp_specs
+	-mcpu=cypress
+	-ffunction-sections
+	-fdata-sections
+	-Wall
+	-Wmissing-prototypes
+	-Wimplicit-function-declaration
+	-Wstrict-prototypes
+	-Wnested-externs
+	-O2
+	-g
+
+)
+
+target_link_options(${TARGET_NAME} PUBLIC
+	-B${RTEMS_ARCH_LIB_PATH}
+	-B${RTEMS_BSP_LIB_PATH}
+	-qrtems
+	--specs bsp_specs
+	-Wl,--gc-sections
+	-Wl,-Bstatic
+	-Wl,-Bdynamic
+)
+
 endif()
+
+
 endfunction()
+

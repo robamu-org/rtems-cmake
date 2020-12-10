@@ -12,6 +12,7 @@ function(rtems_general_config TARGET_NAME RTEMS_INST RTEMS_BSP)
 
 	set(RTEMS_BSP_LIB_PATH CACHE INTERNAL "")
 	set(RTEMS_BSP_INC_PATH CACHE INTERNAL "")
+	set(RTEMS_ARCH_LIB_PATH CACHE INTERNAL "")
 	
 	include(${RTEMS_CONFIG_DIRECTORY}/RTEMSGeneric.cmake)
 	rtems_generic_config(${TARGET_NAME} ${RTEMS_INST} ${RTEMS_BSP})
