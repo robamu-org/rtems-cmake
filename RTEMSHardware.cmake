@@ -23,7 +23,7 @@ target_compile_options(${TARGET_NAME} PUBLIC
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC
-	"${RTEMS_BSP_INC_PATH}"
+	${RTEMS_BSP_INC_PATH}
 )
 
 target_link_options(${TARGET_NAME} BEFORE PUBLIC 
