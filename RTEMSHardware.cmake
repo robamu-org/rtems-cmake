@@ -10,18 +10,24 @@
 function(rtems_hw_config TARGET_NAME RTEMS_INST RTEMS_BSP)
 
 if(RTEMS_BSP STREQUAL "arm/stm32h7")
-target_compile_options(${TARGET_NAME} PUBLIC 
-	-mthumb
-	-mcpu=cortex-m7
+
+set(ABI_FLAGS 
+	-mthumb 
+	-mcpu=cortex-m7 
 	-mfpu=fpv5-d16
 	-mfloat-abi=hard
 )
 
+target_compile_options(${TARGET_NAME} PUBLIC 
+	"${ABI_FLAGS}"
+)
+
+target_include_directories(${TARGET_NAME} PUBLIC
+	"${RTEMS_BSP_INC_PATH}"
+)
+
 target_link_options(${TARGET_NAME} BEFORE PUBLIC 
-	-mthumb
-	-mcpu=cortex-m7
-	-mfpu=fpv5-d16
-	-mfloat-abi=hard
+	"${ABI_FLAGS}"
 )
 
 target_link_options(${TARGET_NAME} PUBLIC
@@ -29,6 +35,7 @@ target_link_options(${TARGET_NAME} PUBLIC
 	-Wl,-Bstatic
 	-Wl,-Bdynamic
 	-qrtems
+	-B${RTEMS_BSP_LIB_PATH}
 )
 
 endif()

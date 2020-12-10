@@ -103,11 +103,6 @@ message(STATUS "RTEMS linker: ${RTEMS_LINKER}")
 if(${RTEMS_ARCH_NAME} STREQUAL "arm")
     set(CMAKE_SYSTEM_PROCESSOR arm PARENT_SCOPE)
 endif()
-
-target_link_directories(${TARGET_NAME} PUBLIC
-	${RTEMS_BSP_LIB_PATH})
-target_include_directories(${TARGET_NAME} PUBLIC
-	${RTEMS_BSP_INC_PATH})
 	
 ###############################################################################
 # Setting variables in upper scope (only the upper scope!)
@@ -117,5 +112,8 @@ set(CMAKE_C_COMPILER ${RTEMS_GCC} PARENT_SCOPE)
 set(CMAKE_CXX_COMPILER ${RTEMS_GXX} PARENT_SCOPE)
 set(CMAKE_ASM_COMPILER ${RTEMS_ASM} PARENT_SCOPE)
 set(CMAKE_LINKER ${RTEMS_LINKER} PARENT_SCOPE)
+
+set(RTEMS_BSP_LIB_PATH ${RTEMS_BSP_LIB_PATH} PARENT_SCOPE)
+set(RTEMS_BSP_INC_PATH ${RTEMS_BSP_INC_PATH} PARENT_SCOPE)
 
 endfunction()
