@@ -10,7 +10,7 @@
 
 function(rtems_general_config TARGET_NAME RTEMS_INST RTEMS_BSP)
 
-	include(RTEMSGeneric.cmake)
+	include(${RTEMS_CONFIG_DIRECTORY}/RTEMSGeneric.cmake)
 	rtems_generic_config(${TARGET_NAME} ${RTEMS_INST} ${RTEMS_BSP})
 	
 	# Not an ideal solution but it will do for now because the number of 
@@ -24,7 +24,7 @@ function(rtems_general_config TARGET_NAME RTEMS_INST RTEMS_BSP)
 	set(CMAKE_ASM_COMPILER ${CMAKE_ASM_COMPILER} PARENT_SCOPE)
 	set(CMAKE_LINKER ${CMAKE_LINKER} PARENT_SCOPE)
 	
-	include(RTEMSHardware.cmake)
+	include(${RTEMS_CONFIG_DIRECTORY}/RTEMSHardware.cmake)
 	rtems_hw_config(${TARGET_NAME} ${RTEMS_INST} ${RTEMS_BSP})
 
 	# No propagation necessary here because we can use target specific settings.
