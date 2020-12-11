@@ -2,24 +2,48 @@
 # Generic RTEMS configuration
 ################################################################################
 
-# This function performs the generic RTEMS configuration. It expects
-# following arguments:
+# This function performs the generic RTEMS configuration. Following function
+# arguments are mandatory:
+#
 # 1. Target/executable name
-# 2. RTEMS installation prefix, path where the RTEMS toolchain is installed
-# 3. RTEMS BSP, which consists generally has the format <Architecture>/<BSP>
-function(rtems_generic_config TARGET_NAME RTEMS_INST RTEMS_BSP)
+# 2. Path to the RTEMS tools
+# 3. RTEMS BSP pair name, which consists generally has the 
+#    format <Architecture>/<BSP>
+#
+# Following function arguments are optional and can simply be supplied
+# behind the last mandatory argument in the right order:
+# 
+# 1. RTEMS BSP path. The BSP might be installed in a different path. If this is 
+#    not supplied, this path will be autodetermined from the BSP pair name 
+#    and the RTEMS tools path.
+#
+# In addition, the user can supply RTEMS_VERSION to specify the RTEMS version
+# manually. This is required to determine the toolchains to use. If no
+# RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
+# RTEMS version from the supplied tools path.
+
+function(rtems_generic_config TARGET_NAME RTEMS_TOOLS RTEMS_BSP_PAIR)
+
+set (EXTRA_RTEMS_ARGS ${ARGN})
+list(LENGTH EXTRA_RTEMS_ARGS NUM_EXTRA_RTEMS_ARGS)
+
+if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
+	# This only works for one optional arguments! Need to write list to 
+	# single variables if this is extended.
+	set(RTEMS_BSP_PATH ${EXTRA_RTEMS_ARGS})
+endif()
 
 set(RTEMS_VERSION "" CACHE STRING "RTEMS version")
 set(RTEMS_PREFIX "" CACHE FILEPATH "Install prefix")
 
-if(RTEMS_PREFIX NOT STREQUAL "")
+if(${RTEMS_PREFIX} NOT STREQUAL "")
 	# For now, a provided RTEMS_PREFIX will simply overwrite the default 
 	# CMake install location.
 	set(CMAKE_INSTALL_PREFIX ${RTEMS_PREFIX} PARENT_SCOPE)
 endif()
 	
 message(STATUS "Setting up and checking RTEMS cross compile configuration..")
-if (RTEMS_INST STREQUAL "")
+if (RTEMS_TOOLS STREQUAL "")
 	message(FATAL_ERROR "RTEMS toolchain path has to be specified!")
 endif()  
 
@@ -30,7 +54,7 @@ if(RTEMS_VERSION STREQUAL "")
     message(STATUS "Version ${RTEMS_VERSION} found")
 endif()
 
-string(REPLACE "/" ";" RTEMS_BSP_LIST_SEPARATED ${RTEMS_BSP})
+string(REPLACE "/" ";" RTEMS_BSP_LIST_SEPARATED ${RTEMS_BSP_PAIR})
 list(LENGTH RTEMS_BSP_LIST_SEPARATED BSP_LIST_SIZE)
 
 if(NOT ${BSP_LIST_SIZE} EQUAL 2)
@@ -42,21 +66,34 @@ list(GET RTEMS_BSP_LIST_SEPARATED 1 RTEMS_BSP_NAME)
 
 set(RTEMS_ARCH_TOOLS "${RTEMS_ARCH_NAME}-rtems${RTEMS_VERSION}")
 
-if(IS_DIRECTORY "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}")
-    if(IS_DIRECTORY "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib")
-        set(RTEMS_ARCH_LIB_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib" PARENT_SCOPE)
-    endif()
-	set(RTEMS_BSP_LIB_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}/lib")
-	if(NOT IS_DIRECTORY "${RTEMS_BSP_LIB_PATH}") 
-		message(FATAL_ERROR "RTEMS BSP lib folder not found at ${RTEMS_BSP_LIB_PATH}")
-	endif()
-	set(RTEMS_BSP_INC_PATH "${RTEMS_BSP_LIB_PATH}/include")
-	if(NOT IS_DIRECTORY "${RTEMS_BSP_INC_PATH}")
-		message(FATAL_ERROR "RTEMS BSP include folder not found at ${RTEMS_BSP_INC_PATH}")
-	endif()
-else()
-	message(FATAL_ERROR "RTEMS Architecure folder not found at ${RTEMS_INST}/${RTEMS_ARCH_TOOLS}")
+if(NOT IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}")
+	message(FATAL_ERROR "RTEMS Architecure folder not found at ${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}")
 endif()
+
+if(IS_DIRECTORY "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib")
+	set(RTEMS_ARCH_LIB_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib" PARENT_SCOPE)
+endif()
+    
+# This can also be supplied as an optional argument to the function
+if(NOT RTEMS_BSP_PATH) 
+	# Autodetermined..
+	set(RTEMS_BSP_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
+endif()
+
+if(NOT IS_DIRECTORY ${RTEMS_BSP_PATH})
+	message(STATUS "Supplied or autodetermined BSP path ${RTEMS_BSP_PATH} is invalid!")
+	message(FATAL_ERROR "Please check the BSP path or make sure the BSP is installed.")
+endif()
+
+set(RTEMS_BSP_LIB_PATH "${RTEMS_BSP_PATH}/lib")
+if(NOT IS_DIRECTORY "${RTEMS_BSP_LIB_PATH}") 
+	message(FATAL_ERROR "RTEMS BSP lib folder not found at ${RTEMS_BSP_LIB_PATH}")
+endif()
+set(RTEMS_BSP_INC_PATH "${RTEMS_BSP_LIB_PATH}/include")
+if(NOT IS_DIRECTORY "${RTEMS_BSP_INC_PATH}")
+	message(FATAL_ERROR "RTEMS BSP include folder not found at ${RTEMS_BSP_INC_PATH}")
+endif()
+
 
 ################################################################################
 # Checking the toolchain

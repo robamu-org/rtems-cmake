@@ -40,6 +40,11 @@ target_link_options(${TARGET_NAME} PUBLIC
 
 elseif(RTEMS_BSP STREQUAL "sparc/erc32")
 
+# The options for RSB builds and RTEMS source build are different.. 
+# This one is for the RSB build
+
+if(EXISTS ${RTEMS_BSP_LIB_PATH}/bsp-specs)
+
 target_compile_options(${TARGET_NAME} PUBLIC
 	-qrtems
 	-B${RTEMS_ARCH_LIB_PATH}
@@ -55,7 +60,6 @@ target_compile_options(${TARGET_NAME} PUBLIC
 	-Wnested-externs
 	-O2
 	-g
-
 )
 
 target_link_options(${TARGET_NAME} PUBLIC
@@ -67,6 +71,25 @@ target_link_options(${TARGET_NAME} PUBLIC
 	-Wl,-Bstatic
 	-Wl,-Bdynamic
 )
+
+else()
+
+target_compile_options(${TARGET_NAME} PUBLIC 
+	-mcpu=cypress
+)
+
+target_include_directories(${TARGET_NAME} PUBLIC
+	${RTEMS_BSP_INC_PATH}
+)
+
+target_link_options(${TARGET_NAME} PUBLIC
+	-qrtems
+	-B${RTEMS_BSP_LIB_PATH}
+	-Wl,--gc-sections
+)
+
+endif()
+
 
 endif()
 
