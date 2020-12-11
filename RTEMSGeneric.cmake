@@ -17,10 +17,15 @@
 #    not supplied, this path will be autodetermined from the BSP pair name 
 #    and the RTEMS tools path. The full path has to be specified for now.
 #
-# In addition, the user can supply RTEMS_VERSION to specify the RTEMS version
-# manually. This is required to determine the toolchains to use. If no
-# RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
-# RTEMS version from the supplied tools path.
+# Other variables which can be provided by the developer via command line:
+# 1. RTEMS_VERSION:
+#    The user can supply RTEMS_VERSION to specify the RTEMS version
+#    manually. This is required to determine the toolchains to use. If no
+#    RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
+#    RTEMS version from the supplied tools path.
+#  2. RTEMS_PREFIX:
+#	 The user can provide this variable to override the default CMake install
+#    location. This can also be done by supplying CMAKE_INSTALL_PREFIX
 
 function(rtems_generic_config TARGET_NAME RTEMS_TOOLS RTEMS_BSP_PAIR)
 
@@ -34,13 +39,15 @@ if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
 endif()
 
 set(RTEMS_VERSION "" CACHE STRING "RTEMS version")
-set(RTEMS_PREFIX "" CACHE FILEPATH "Install prefix")
+set(RTEMS_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "Install prefix")
 
-if(${RTEMS_PREFIX} NOT STREQUAL "")
+if(NOT ${RTEMS_PREFIX} MATCHES ${CMAKE_INSTALL_PREFIX})
 	# For now, a provided RTEMS_PREFIX will simply overwrite the default 
 	# CMake install location.
 	set(CMAKE_INSTALL_PREFIX ${RTEMS_PREFIX} PARENT_SCOPE)
 endif()
+
+message(STATUS "Install path set to ${RTEMS_PREFIX}")
 	
 message(STATUS "Setting up and checking RTEMS cross compile configuration..")
 if (RTEMS_TOOLS STREQUAL "")
@@ -49,8 +56,8 @@ endif()
 
 if(RTEMS_VERSION STREQUAL "")
     message(STATUS "No RTEMS_VERSION supplied.")
-    message(STATUS "Autodetermining version from tools path ${RTEMS_INST} ..")
-    string(REGEX MATCH [0-9]+$ RTEMS_VERSION "${RTEMS_INST}")
+    message(STATUS "Autodetermining version from tools path ${RTEMS_TOOLS} ..")
+    string(REGEX MATCH [0-9]+$ RTEMS_VERSION "${RTEMS_TOOLS}")
     message(STATUS "Version ${RTEMS_VERSION} found")
 endif()
 
@@ -76,15 +83,15 @@ if(NOT IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}")
 	)
 endif()
 
-if(IS_DIRECTORY "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib")
-	set(RTEMS_ARCH_LIB_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib" PARENT_SCOPE)
+if(IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}/lib")
+	set(RTEMS_ARCH_LIB_PATH "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}/lib" PARENT_SCOPE)
 endif()
     
 # This can also be supplied as an optional argument to the function
 if(NOT RTEMS_BSP_PATH) 
 	# Autodetermined..
 	set(STATUS "Autodetermining BSP path..")
-	set(RTEMS_BSP_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
+	set(RTEMS_BSP_PATH "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
 endif()
 
 if(NOT IS_DIRECTORY ${RTEMS_BSP_PATH})
@@ -119,9 +126,9 @@ endif()
 ################################################################################
 
 message(STATUS "Checking for RTEMS binaries folder..")
-set(RTEMS_BIN_PATH "${RTEMS_INST}/bin")
+set(RTEMS_BIN_PATH "${RTEMS_TOOLS}/bin")
 if(NOT IS_DIRECTORY "${RTEMS_BIN_PATH}")
-	message(FATAL_ERROR "RTEMS binaries folder not found at ${RTEMS_INST}/bin")
+	message(FATAL_ERROR "RTEMS binaries folder not found at ${RTEMS_TOOLS}/bin")
 endif()
 
 message(STATUS "Checking for RTEMS gcc..")
@@ -165,7 +172,7 @@ message(STATUS "Checking done")
 ###########################################
 
 message(STATUS "RTEMS Version: ${RTEMS_VERSION}")
-message(STATUS "RTEMS installation path: ${RTEMS_INST}")
+message(STATUS "RTEMS tools path: ${RTEMS_TOOLS}")
 message(STATUS "RTEMS Architecture tools path: ${RTEMS_ARCH_TOOLS}")
 message(STATUS "RTEMS BSP: ${RTEMS_BSP}")
 message(STATUS "RTEMS BSP LIB path: ${RTEMS_BSP_LIB_PATH}")
