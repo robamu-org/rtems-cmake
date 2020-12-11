@@ -11,88 +11,84 @@ function(rtems_hw_config TARGET_NAME RTEMS_INST RTEMS_BSP)
 
 if(RTEMS_BSP STREQUAL "arm/stm32h7")
 
-set(ABI_FLAGS 
-	-mthumb 
-	-mcpu=cortex-m7 
-	-mfpu=fpv5-d16
-	-mfloat-abi=hard
-)
-
-target_compile_options(${TARGET_NAME} PUBLIC 
-	"${ABI_FLAGS}"
-)
-
-target_include_directories(${TARGET_NAME} PUBLIC
-	${RTEMS_BSP_INC_PATH}
-)
-
-target_link_options(${TARGET_NAME} BEFORE PUBLIC 
-	"${ABI_FLAGS}"
-)
-
-target_link_options(${TARGET_NAME} PUBLIC
-	-Wl,--gc-sections
-	-Wl,-Bstatic
-	-Wl,-Bdynamic
-	-qrtems
-	-B${RTEMS_BSP_LIB_PATH}
-)
+	set(ABI_FLAGS 
+		-mthumb 
+		-mcpu=cortex-m7 
+		-mfpu=fpv5-d16
+		-mfloat-abi=hard
+	)
+	
+	target_compile_options(${TARGET_NAME} PUBLIC 
+		"${ABI_FLAGS}"
+	)
+	
+	target_include_directories(${TARGET_NAME} PUBLIC
+		${RTEMS_BSP_INC_PATH}
+	)
+	
+	target_link_options(${TARGET_NAME} BEFORE PUBLIC 
+		"${ABI_FLAGS}"
+	)
+	
+	target_link_options(${TARGET_NAME} PUBLIC
+		-Wl,--gc-sections
+		-Wl,-Bstatic
+		-Wl,-Bdynamic
+		-qrtems
+		-B${RTEMS_BSP_LIB_PATH}
+	)
 
 elseif(RTEMS_BSP STREQUAL "sparc/erc32")
 
-# The options for RSB builds and RTEMS source build are different.. 
-# This one is for the RSB build
+	# The options for RSB builds and RTEMS source build are different.. 
+	# This one is for the RSB build
+	if(EXISTS "${RTEMS_BSP_LIB_PATH}/bsp_specs")
 
-if(EXISTS ${RTEMS_BSP_LIB_PATH}/bsp-specs)
+	target_compile_options(${TARGET_NAME} PUBLIC
+		-qrtems
+		-B${RTEMS_ARCH_LIB_PATH}
+		-B${RTEMS_BSP_LIB_PATH}
+		--specs bsp_specs
+		-mcpu=cypress
+		-ffunction-sections
+		-fdata-sections
+	)
+	
+	target_link_options(${TARGET_NAME} PUBLIC
+		-B${RTEMS_ARCH_LIB_PATH}
+		-B${RTEMS_BSP_LIB_PATH}
+		-qrtems
+		--specs bsp_specs
+		-Wl,--gc-sections
+		-Wl,-Bstatic
+		-Wl,-Bdynamic
+	)
 
-target_compile_options(${TARGET_NAME} PUBLIC
-	-qrtems
-	-B${RTEMS_ARCH_LIB_PATH}
-	-B${RTEMS_BSP_LIB_PATH}
-	--specs bsp_specs
-	-mcpu=cypress
-	-ffunction-sections
-	-fdata-sections
-	-Wall
-	-Wmissing-prototypes
-	-Wimplicit-function-declaration
-	-Wstrict-prototypes
-	-Wnested-externs
-	-O2
-	-g
-)
+	else()
 
-target_link_options(${TARGET_NAME} PUBLIC
-	-B${RTEMS_ARCH_LIB_PATH}
-	-B${RTEMS_BSP_LIB_PATH}
-	-qrtems
-	--specs bsp_specs
-	-Wl,--gc-sections
-	-Wl,-Bstatic
-	-Wl,-Bdynamic
-)
+	target_compile_options(${TARGET_NAME} PUBLIC 
+		-mcpu=cypress
+	)
+	
+	target_include_directories(${TARGET_NAME} PUBLIC
+		${RTEMS_BSP_INC_PATH}
+	)
+	
+	target_link_options(${TARGET_NAME} PUBLIC
+		-qrtems
+		-B${RTEMS_BSP_LIB_PATH}
+		-Wl,--gc-sections
+	)
+
+endif()
 
 else()
 
-target_compile_options(${TARGET_NAME} PUBLIC 
-	-mcpu=cypress
-)
-
-target_include_directories(${TARGET_NAME} PUBLIC
-	${RTEMS_BSP_INC_PATH}
-)
-
-target_link_options(${TARGET_NAME} PUBLIC
-	-qrtems
-	-B${RTEMS_BSP_LIB_PATH}
-	-Wl,--gc-sections
+	status(WARNING "The pkgconfig for this BSP still needs to be set up \
+in RTEMSHardware.cmake!"
 )
 
 endif()
-
-
-endif()
-
 
 endfunction()
 
