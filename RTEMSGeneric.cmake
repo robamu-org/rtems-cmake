@@ -6,28 +6,29 @@
 # arguments are mandatory:
 #
 # 1. Target/executable name
-# 2. Path to the RTEMS tools
+# 2. RTEMS prefix. This is generally the path where the RTEMS tools and BSPs
+#    are installed. More experienced users can use multiple prefixes.
+#	 This value will be cached inside the RTEMS_PREFIX variable.
 # 3. RTEMS BSP pair name, which consists generally has the 
-#    format <Architecture>/<BSP>
+#    format <Architecture>/<BSP>. This variable will be cached inside
+#    the RTEMS_BSP variable.
 #
-# Following function arguments are optional and can simply be supplied
-# behind the last mandatory argument in the right order:
-# 
-# 1. RTEMS BSP path. The BSP might be installed in a different path. If this is 
-#    not supplied, this path will be autodetermined from the BSP pair name 
-#    and the RTEMS tools path. The full path has to be specified for now.
+# Other variables which can be provided by the developer via command line
+# as well:
 #
-# Other variables which can be provided by the developer via command line:
 # 1. RTEMS_VERSION:
 #    The user can supply RTEMS_VERSION to specify the RTEMS version
 #    manually. This is required to determine the toolchains to use. If no
 #    RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
 #    RTEMS version from the supplied tools path.
-#  2. RTEMS_PREFIX:
-#	 The user can provide this variable to override the default CMake install
-#    location. This can also be done by supplying CMAKE_INSTALL_PREFIX
+# 2. RTEMS_TOOLS:
+#	 The user can provide this filepath variable if the RTEMS tools path is 
+#    not equal to the RTEMS prefix.
+# 3. RTEMS_PATH:
+#	 The user can provide this filepath variable if the RTEMS path (containig
+#    the BSPs) is not equal to the RTEMS prefix.
 
-function(rtems_generic_config TARGET_NAME RTEMS_TOOLS RTEMS_BSP_PAIR)
+function(rtems_generic_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 
 set (EXTRA_RTEMS_ARGS ${ARGN})
 list(LENGTH EXTRA_RTEMS_ARGS NUM_EXTRA_RTEMS_ARGS)
@@ -35,31 +36,45 @@ list(LENGTH EXTRA_RTEMS_ARGS NUM_EXTRA_RTEMS_ARGS)
 if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
 	# This only works for one optional arguments! Need to write list to 
 	# single variables if this is extended.
-	set(RTEMS_BSP_PATH ${EXTRA_RTEMS_ARGS})
+	set(RTEMS_PATH ${EXTRA_RTEMS_ARGS})
 endif()
 
-set(RTEMS_VERSION "" CACHE STRING "RTEMS version")
-set(RTEMS_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE FILEPATH "Install prefix")
+set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
+set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP pair")
 
-if(NOT ${RTEMS_PREFIX} MATCHES ${CMAKE_INSTALL_PREFIX})
-	# For now, a provided RTEMS_PREFIX will simply overwrite the default 
-	# CMake install location.
-	set(CMAKE_INSTALL_PREFIX ${RTEMS_PREFIX} PARENT_SCOPE)
+set(RTEMS_INSTALL 
+	${CMAKE_INSTALL_PREFIX} 
+	CACHE FILEPATH "RTEMS install destination"
+)
+
+if(NOT RTEMS_PATH)
+	message(STATUS 
+		"RTEMS path was not specified and was set to RTEMS prefix."
+	)
+	set(RTEMS_PATH ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS folder")
+else()
+	set(RTEMS_TOOLS ${RTEMS_PATH} CACHE FILEPATH "RTEMS path folder")
 endif()
 
-message(STATUS "Install path set to ${RTEMS_PREFIX}")
-	
-message(STATUS "Setting up and checking RTEMS cross compile configuration..")
-if (RTEMS_TOOLS STREQUAL "")
-	message(FATAL_ERROR "RTEMS toolchain path has to be specified!")
-endif()  
+if(NOT RTEMS_TOOLS)
+	message(STATUS 
+		"RTEMS toolchain path was not specified and was set to RTEMS prefix."
+	)
+	set(RTEMS_TOOLS ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS tools folder")
+else()
+	set(RTEMS_TOOLS ${RTEMS_TOOLS} CACHE FILEPATH "RTEMS tools folder")
+endif()
 
-if(RTEMS_VERSION STREQUAL "")
-    message(STATUS "No RTEMS_VERSION supplied.")
+if(NOT RTEMS_VERSION)
+	message(STATUS "No RTEMS_VERSION supplied.")
     message(STATUS "Autodetermining version from tools path ${RTEMS_TOOLS} ..")
     string(REGEX MATCH [0-9]+$ RTEMS_VERSION "${RTEMS_TOOLS}")
     message(STATUS "Version ${RTEMS_VERSION} found")
 endif()
+
+set(RTEMS_VERSION "${RTEMS_VERSION}" CACHE STRING "RTEMS version")
+
+message(STATUS "Setting up and checking RTEMS cross compile configuration..")
 
 string(REPLACE "/" ";" RTEMS_BSP_LIST_SEPARATED ${RTEMS_BSP_PAIR})
 list(LENGTH RTEMS_BSP_LIST_SEPARATED BSP_LIST_SIZE)
@@ -76,24 +91,18 @@ list(GET RTEMS_BSP_LIST_SEPARATED 1 RTEMS_BSP_NAME)
 
 set(RTEMS_ARCH_TOOLS "${RTEMS_ARCH_NAME}-rtems${RTEMS_VERSION}")
 
-if(NOT IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}")
+if(NOT IS_DIRECTORY "${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}")
 	message(FATAL_ERROR 
-		"RTEMS Architecure folder not found at "
-		"${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}"
+		"RTEMS architecure folder not found at "
+		"${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}"
 	)
 endif()
 
-if(IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}/lib")
-	set(RTEMS_ARCH_LIB_PATH "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}/lib" PARENT_SCOPE)
+if(IS_DIRECTORY "${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}/lib")
+	set(RTEMS_ARCH_LIB_PATH "${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}/lib" PARENT_SCOPE)
 endif()
     
-# This can also be supplied as an optional argument to the function
-if(NOT RTEMS_BSP_PATH) 
-	# Autodetermined..
-	set(STATUS "Autodetermining BSP path..")
-	set(RTEMS_BSP_PATH "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
-endif()
-
+set(RTEMS_BSP_PATH "${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
 if(NOT IS_DIRECTORY ${RTEMS_BSP_PATH})
 	message(STATUS 
 		"Supplied or autodetermined BSP path "
@@ -171,12 +180,15 @@ message(STATUS "Checking done")
 # Info output
 ###########################################
 
-message(STATUS "RTEMS Version: ${RTEMS_VERSION}")
+message(STATUS "RTEMS version: ${RTEMS_VERSION}")
+message(STATUS "RTEMS prefix: ${RTEMS_PREFIX}")
 message(STATUS "RTEMS tools path: ${RTEMS_TOOLS}")
-message(STATUS "RTEMS Architecture tools path: ${RTEMS_ARCH_TOOLS}")
-message(STATUS "RTEMS BSP: ${RTEMS_BSP}")
-message(STATUS "RTEMS BSP LIB path: ${RTEMS_BSP_LIB_PATH}")
-message(STATUS "RTEMS BSP INC path: ${RTEMS_BSP_INC_PATH}")
+message(STATUS "RTEMS BSP pair: ${RTEMS_BSP}")
+message(STATUS "RTEMS architecture tools path: "
+	"${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}")
+message(STATUS "RTEMS BSP library path: ${RTEMS_BSP_LIB_PATH}")
+message(STATUS "RTEMS BSP include path: ${RTEMS_BSP_INC_PATH}")
+message(STATUS "RTEMS install target: ${RTEMS_INSTALL}")
 
 message(STATUS "RTEMS gcc compiler: ${RTEMS_GCC}")
 message(STATUS "RTEMS g++ compiler: ${RTEMS_GXX}")
@@ -196,7 +208,10 @@ set(CMAKE_CXX_COMPILER ${RTEMS_GXX} PARENT_SCOPE)
 set(CMAKE_ASM_COMPILER ${RTEMS_ASM} PARENT_SCOPE)
 set(CMAKE_LINKER ${RTEMS_LINKER} PARENT_SCOPE)
 
-set(RTEMS_BSP_LIB_PATH ${RTEMS_BSP_LIB_PATH} PARENT_SCOPE)
-set(RTEMS_BSP_INC_PATH ${RTEMS_BSP_INC_PATH} PARENT_SCOPE)
+set(RTEMS_BSP_LIB_PATH ${RTEMS_BSP_LIB_PATH} CACHE FILEPATH "BSP library path")
+set(RTEMS_BSP_INC_PATH ${RTEMS_BSP_INC_PATH} CACHE FILEPATH "BSP include path")
+set(RTEMS_ARCH_LIB_PATH ${RTEMS_BSP_INC_PATH} 
+	CACHE FILEPATH "Architecture library path"
+)
 
 endfunction()

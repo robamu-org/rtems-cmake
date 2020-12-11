@@ -7,7 +7,16 @@
 # 1. Target/executable name
 # 2. RTEMS installation prefix, path where the RTEMS toolchain is installed
 # 3. RTEMS BSP, which consists generally has the format <Architecture>/<BSP>
-function(rtems_hw_config TARGET_NAME RTEMS_INST RTEMS_BSP)
+#
+# The following paths should have been set and cached previously:
+#
+# 1. RTEMS_ARCH_LIB_PATH: Library path for the architecture
+# 2. RTEMS_BSP_LIB_PATH: Library path for the BSP
+# 3. RTEMS_BSP_INC_PATH: Include path for the BSP
+#
+# TODO: Maybe CMake can read the pkgconfig .pc files automatically?
+
+function(rtems_hw_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP)
 
 if(RTEMS_BSP STREQUAL "arm/stm32h7")
 
@@ -86,7 +95,7 @@ else()
 
 	status(WARNING 
 		"The pkgconfig for this BSP still needs to be set up"
-		"in RTEMSHardware.cmake!"
+		"transferred to RTEMSHardware.cmake!"
 	)
 
 endif()
