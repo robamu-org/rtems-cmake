@@ -15,7 +15,7 @@
 # 
 # 1. RTEMS BSP path. The BSP might be installed in a different path. If this is 
 #    not supplied, this path will be autodetermined from the BSP pair name 
-#    and the RTEMS tools path.
+#    and the RTEMS tools path. The full path has to be specified for now.
 #
 # In addition, the user can supply RTEMS_VERSION to specify the RTEMS version
 # manually. This is required to determine the toolchains to use. If no
@@ -77,6 +77,7 @@ endif()
 # This can also be supplied as an optional argument to the function
 if(NOT RTEMS_BSP_PATH) 
 	# Autodetermined..
+	set(STATUS "Autodetermining BSP path..")
 	set(RTEMS_BSP_PATH "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
 endif()
 

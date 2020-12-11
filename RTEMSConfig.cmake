@@ -8,6 +8,18 @@
 # 2. Path to the RTEMS tools
 # 3. RTEMS BSP pair name, which consists generally has the 
 #    format <Architecture>/<BSP>
+#
+# Following function arguments are optional and can simply be supplied
+# behind the last mandatory argument in the right order:
+# 
+# 1. RTEMS BSP path. The BSP might be installed in a different path. If this is 
+#    not supplied, this path will be autodetermined from the BSP pair name 
+#    and the RTEMS tools path. The full path has to be specified for now.
+#
+# In addition, the user can supply RTEMS_VERSION to specify the RTEMS version
+# manually. This is required to determine the toolchains to use. If no
+# RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
+# RTEMS version from the supplied tools path.
 
 function(rtems_general_config TARGET_NAME RTEMS_INST RTEMS_BSP_PAIR)
 
@@ -16,7 +28,7 @@ function(rtems_general_config TARGET_NAME RTEMS_INST RTEMS_BSP_PAIR)
 	set(RTEMS_ARCH_LIB_PATH CACHE INTERNAL "")
 	
 	include(${RTEMS_CONFIG_DIRECTORY}/RTEMSGeneric.cmake)
-	rtems_generic_config(${TARGET_NAME} ${RTEMS_INST} ${RTEMS_BSP_PAIR})
+	rtems_generic_config(${TARGET_NAME} ${RTEMS_INST} ${RTEMS_BSP_PAIR} ${ARGN})
 	
 	# Not an ideal solution but it will do for now because the number of 
 	# variables which need to be propagated to the upper most CMakeLists.txt
