@@ -39,11 +39,12 @@ function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 	# variables which need to be propagated to the upper most CMakeLists.txt
 	# should not become too high.
 	# We could also use CMAKE_TOOLCHAIN_FILE but this way works as well.
+
 	set(CMAKE_C_COMPILER ${CMAKE_C_COMPILER} PARENT_SCOPE)
 	set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} PARENT_SCOPE)
 	set(CMAKE_ASM_COMPILER ${CMAKE_ASM_COMPILER} PARENT_SCOPE)
 	set(CMAKE_LINKER ${CMAKE_LINKER} PARENT_SCOPE)
-	
+		
 	# I don't know what this is used for yet, but it might become handy
 	if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
 		set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} PARENT_SCOPE)
