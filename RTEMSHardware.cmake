@@ -84,9 +84,10 @@ endif()
 
 else()
 
-	status(WARNING "The pkgconfig for this BSP still needs to be set up \
-in RTEMSHardware.cmake!"
-)
+	status(WARNING 
+		"The pkgconfig for this BSP still needs to be set up"
+		"in RTEMSHardware.cmake!"
+	)
 
 endif()
 

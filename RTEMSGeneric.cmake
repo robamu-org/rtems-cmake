@@ -58,7 +58,10 @@ string(REPLACE "/" ";" RTEMS_BSP_LIST_SEPARATED ${RTEMS_BSP_PAIR})
 list(LENGTH RTEMS_BSP_LIST_SEPARATED BSP_LIST_SIZE)
 
 if(NOT ${BSP_LIST_SIZE} EQUAL 2)
-    message(FATAL_ERROR "Supplied RTEMS_BSP variable invalid. Make sure to provide a slash separated string")
+    message(FATAL_ERROR 
+    	"Supplied RTEMS_BSP variable invalid. " 
+    	"Make sure to provide a slash separated string"
+    )
 endif()
 
 list(GET RTEMS_BSP_LIST_SEPARATED 0 RTEMS_ARCH_NAME)
@@ -67,7 +70,10 @@ list(GET RTEMS_BSP_LIST_SEPARATED 1 RTEMS_BSP_NAME)
 set(RTEMS_ARCH_TOOLS "${RTEMS_ARCH_NAME}-rtems${RTEMS_VERSION}")
 
 if(NOT IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}")
-	message(FATAL_ERROR "RTEMS Architecure folder not found at ${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}")
+	message(FATAL_ERROR 
+		"RTEMS Architecure folder not found at "
+		"${RTEMS_TOOLS}/${RTEMS_ARCH_TOOLS}"
+	)
 endif()
 
 if(IS_DIRECTORY "${RTEMS_INST}/${RTEMS_ARCH_TOOLS}/lib")
@@ -82,17 +88,29 @@ if(NOT RTEMS_BSP_PATH)
 endif()
 
 if(NOT IS_DIRECTORY ${RTEMS_BSP_PATH})
-	message(STATUS "Supplied or autodetermined BSP path ${RTEMS_BSP_PATH} is invalid!")
-	message(FATAL_ERROR "Please check the BSP path or make sure the BSP is installed.")
+	message(STATUS 
+		"Supplied or autodetermined BSP path "
+		"${RTEMS_BSP_PATH} is invalid!"
+	)
+	message(FATAL_ERROR 
+		"Please check the BSP path or make sure " 
+		"the BSP is installed."
+	)
 endif()
 
 set(RTEMS_BSP_LIB_PATH "${RTEMS_BSP_PATH}/lib")
 if(NOT IS_DIRECTORY "${RTEMS_BSP_LIB_PATH}") 
-	message(FATAL_ERROR "RTEMS BSP lib folder not found at ${RTEMS_BSP_LIB_PATH}")
+	message(FATAL_ERROR 
+		"RTEMS BSP lib folder not found at "
+		"${RTEMS_BSP_LIB_PATH}"
+	)
 endif()
 set(RTEMS_BSP_INC_PATH "${RTEMS_BSP_LIB_PATH}/include")
 if(NOT IS_DIRECTORY "${RTEMS_BSP_INC_PATH}")
-	message(FATAL_ERROR "RTEMS BSP include folder not found at ${RTEMS_BSP_INC_PATH}")
+	message(FATAL_ERROR 
+		"RTEMS BSP include folder not found at "
+		"${RTEMS_BSP_INC_PATH}"
+	)
 endif()
 
 
@@ -109,25 +127,35 @@ endif()
 message(STATUS "Checking for RTEMS gcc..")
 set(RTEMS_GCC "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-gcc")
 if(NOT EXISTS "${RTEMS_GCC}") 
-	message(FATAL_ERROR "RTEMS gcc compiler not found at ${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-gcc")
+	message(FATAL_ERROR 
+		"RTEMS gcc compiler not found at "
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-gcc"
+	)
 endif()
 
 message(STATUS "Checking for RTEMS g++..")
 set(RTEMS_GXX "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-g++")
 if(NOT EXISTS "${RTEMS_GXX}")
-	message(FATAL_ERROR "RTEMS g++ compiler not found at ${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-g++")
+	message(FATAL_ERROR 
+		"RTEMS g++ compiler not found at " 
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-g++"
+	)
 endif()
 
 message(STATUS "Checking for RTEMS assembler..")
 set(RTEMS_ASM "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-as")
 if(NOT EXISTS "${RTEMS_GXX}")
-	message(FATAL_ERROR "RTEMS as compiler not found at ${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-as")
+	message(FATAL_ERROR 
+		"RTEMS as compiler not found at " 
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-as")
 endif()
 
 message(STATUS "Checking for RTEMS linker..")
 set(RTEMS_LINKER "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-ld")
 if(NOT EXISTS "${RTEMS_LINKER}")
-	message(FATAL_ERROR "RTEMS ld linker  not found at ${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-ld")
+	message(FATAL_ERROR 
+		"RTEMS ld linker  not found at "
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-ld")
 endif()
 
 message(STATUS "Checking done")
