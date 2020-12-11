@@ -10,7 +10,14 @@
 function(rtems_generic_config TARGET_NAME RTEMS_INST RTEMS_BSP)
 
 set(RTEMS_VERSION "" CACHE STRING "RTEMS version")
+set(RTEMS_PREFIX "" CACHE FILEPATH "Install prefix")
 
+if(RTEMS_PREFIX NOT STREQUAL "")
+	# For now, a provided RTEMS_PREFIX will simply overwrite the default 
+	# CMake install location.
+	set(CMAKE_INSTALL_PREFIX ${RTEMS_PREFIX} PARENT_SCOPE)
+endif()
+	
 message(STATUS "Setting up and checking RTEMS cross compile configuration..")
 if (RTEMS_INST STREQUAL "")
 	message(FATAL_ERROR "RTEMS toolchain path has to be specified!")
@@ -18,7 +25,7 @@ endif()
 
 if(RTEMS_VERSION STREQUAL "")
     message(STATUS "No RTEMS_VERSION supplied.")
-    message(STATUS "Autodetermining version from prefix ${RTEMS_INST} ..")
+    message(STATUS "Autodetermining version from tools path ${RTEMS_INST} ..")
     string(REGEX MATCH [0-9]+$ RTEMS_VERSION "${RTEMS_INST}")
     message(STATUS "Version ${RTEMS_VERSION} found")
 endif()
