@@ -38,7 +38,9 @@ function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 	# Not an ideal solution but it will do for now because the number of 
 	# variables which need to be propagated to the upper most CMakeLists.txt
 	# should not become too high.
-	# We could also use CMAKE_TOOLCHAIN_FILE but this way works as well.
+	# We could also use CMAKE_TOOLCHAIN_FILE but this way works as well and we 
+	# dont have to supply the file each time, we can set the location in
+	# the uppermost CMakeLists.txt once.
 
 	set(CMAKE_C_COMPILER ${CMAKE_C_COMPILER} PARENT_SCOPE)
 	set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} PARENT_SCOPE)
