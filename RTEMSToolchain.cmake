@@ -1,5 +1,5 @@
 ################################################################################
-# RTEMS toolchain path configuration
+# Generic Toolchain configuration
 ################################################################################
 
 # This file can be loaded with -DCMAKE_TOOLCHAIN_FILE, but we need to
@@ -11,6 +11,7 @@ set(CMAKE_CROSSCOMPILING 1)
 
 set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
 set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP pair")
+option(RTEMS_VERBOSE "Verbose output for the RTEMS CMake support" FALSE)
 
 set(RTEMS_INSTALL 
 	${CMAKE_INSTALL_PREFIX} 
@@ -22,8 +23,8 @@ if(NOT RTEMS_PATH)
 		"RTEMS path was not specified and was set to RTEMS prefix."
 	)
 	set(RTEMS_PATH ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS folder")
-else()
-	set(RTEMS_TOOLS ${RTEMS_PATH} CACHE FILEPATH "RTEMS path folder")
+#else()
+#	set(RTEMS_PATH ${RTEMS_PATH} CACHE FILEPATH "RTEMS path folder")
 endif()
 
 if(NOT RTEMS_TOOLS)
@@ -31,8 +32,8 @@ if(NOT RTEMS_TOOLS)
 		"RTEMS toolchain path was not specified and was set to RTEMS prefix."
 	)
 	set(RTEMS_TOOLS ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS tools folder")
-else()
-	set(RTEMS_TOOLS ${RTEMS_TOOLS} CACHE FILEPATH "RTEMS tools folder")
+#else()
+#	set(RTEMS_TOOLS ${RTEMS_TOOLS} CACHE FILEPATH "RTEMS tools folder")
 endif()
 
 if(NOT RTEMS_VERSION)
@@ -46,8 +47,7 @@ set(RTEMS_VERSION "${RTEMS_VERSION}" CACHE STRING "RTEMS version")
 
 message(STATUS "Setting up and checking RTEMS cross compile configuration..")
 
-string(REPLACE "/" ";" RTEMS_BSP_LIST_SEPARATED ${RTEMS_BSP})
-message(STATUS "${RTEMS_BSP_LIST_SEPARATED}") 
+string(REPLACE "/" ";" RTEMS_BSP_LIST_SEPARATED ${RTEMS_BSP_PAIR})
 list(LENGTH RTEMS_BSP_LIST_SEPARATED BSP_LIST_SIZE)
 
 if(NOT ${BSP_LIST_SIZE} EQUAL 2)
@@ -60,16 +60,19 @@ endif()
 list(GET RTEMS_BSP_LIST_SEPARATED 0 RTEMS_ARCH_NAME)
 list(GET RTEMS_BSP_LIST_SEPARATED 1 RTEMS_BSP_NAME)
 
-set(RTEMS_ARCH_TOOLS "${RTEMS_ARCH_NAME}-rtems${RTEMS_VERSION}")
+set(RTEMS_ARCH_VERSION_NAME "${RTEMS_ARCH_NAME}-rtems${RTEMS_VERSION}")
 
-if(NOT IS_DIRECTORY "${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}")
+if(NOT IS_DIRECTORY "${RTEMS_TOOLS}/${RTEMS_ARCH_VERSION_NAME}")
 	message(FATAL_ERROR 
 		"RTEMS architecure folder not found at "
-		"${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}"
+		"${RTEMS_TOOLS}/${RTEMS_ARCH_VERSION_NAME}"
 	)
 endif()
-    
-set(RTEMS_BSP_PATH "${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}/${RTEMS_BSP_NAME}")
+
+set(RTEMS_ARCH_LIB_PATH "${RTEMS_TOOLS}/${RTEMS_ARCH_VERSION_NAME}/lib")
+set(RTEMS_TOOLS_LIB_PATH "${RTEMS_TOOLS}/lib")
+
+set(RTEMS_BSP_PATH "${RTEMS_PATH}/${RTEMS_ARCH_VERSION_NAME}/${RTEMS_BSP_NAME}")
 if(NOT IS_DIRECTORY ${RTEMS_BSP_PATH})
 	message(STATUS 
 		"Supplied or autodetermined BSP path "
@@ -108,37 +111,37 @@ if(NOT IS_DIRECTORY "${RTEMS_BIN_PATH}")
 endif()
 
 message(STATUS "Checking for RTEMS gcc..")
-set(RTEMS_GCC "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-gcc")
+set(RTEMS_GCC "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-gcc")
 if(NOT EXISTS "${RTEMS_GCC}") 
 	message(FATAL_ERROR 
 		"RTEMS gcc compiler not found at "
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-gcc"
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-gcc"
 	)
 endif()
 
 message(STATUS "Checking for RTEMS g++..")
-set(RTEMS_GXX "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-g++")
+set(RTEMS_GXX "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-g++")
 if(NOT EXISTS "${RTEMS_GXX}")
 	message(FATAL_ERROR 
 		"RTEMS g++ compiler not found at " 
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-g++"
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-g++"
 	)
 endif()
 
 message(STATUS "Checking for RTEMS assembler..")
-set(RTEMS_ASM "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-as")
+set(RTEMS_ASM "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-as")
 if(NOT EXISTS "${RTEMS_GXX}")
 	message(FATAL_ERROR 
 		"RTEMS as compiler not found at " 
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-as")
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-as")
 endif()
 
 message(STATUS "Checking for RTEMS linker..")
-set(RTEMS_LINKER "${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-ld")
+set(RTEMS_LINKER "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld")
 if(NOT EXISTS "${RTEMS_LINKER}")
 	message(FATAL_ERROR 
 		"RTEMS ld linker  not found at "
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_TOOLS}-ld")
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld")
 endif()
 
 message(STATUS "Checking done")
@@ -152,7 +155,7 @@ message(STATUS "RTEMS prefix: ${RTEMS_PREFIX}")
 message(STATUS "RTEMS tools path: ${RTEMS_TOOLS}")
 message(STATUS "RTEMS BSP pair: ${RTEMS_BSP}")
 message(STATUS "RTEMS architecture tools path: "
-	"${RTEMS_PATH}/${RTEMS_ARCH_TOOLS}")
+	"${RTEMS_PATH}/${RTEMS_ARCH_VERSION_NAME}")
 message(STATUS "RTEMS BSP library path: ${RTEMS_BSP_LIB_PATH}")
 message(STATUS "RTEMS BSP include path: ${RTEMS_BSP_INC_PATH}")
 message(STATUS "RTEMS install target: ${RTEMS_INSTALL}")
@@ -175,8 +178,22 @@ set(CMAKE_CXX_COMPILER ${RTEMS_GXX})
 set(CMAKE_ASM_COMPILER ${RTEMS_ASM})
 set(CMAKE_LINKER ${RTEMS_LINKER})
 
+# Variables set in the cache so they can be used everywhere.
+set(RTEMS_ARCH_NAME ${RTEMS_ARCH_NAME} CACHE FILEPATH "Architecture name")
+set(RTEMS_BSP_NAME ${RTEMS_BSP_NAME} CACHE FILEPATH "BSP name")
+set(RTEMS_TOOLS_LIB_PATH ${RTEMS_TOOLS_LIB_PATH} 
+	CACHE FILEPATH "Tools library path"
+)
 set(RTEMS_BSP_LIB_PATH ${RTEMS_BSP_LIB_PATH} CACHE FILEPATH "BSP library path")
 set(RTEMS_BSP_INC_PATH ${RTEMS_BSP_INC_PATH} CACHE FILEPATH "BSP include path")
-set(RTEMS_ARCH_LIB_PATH ${RTEMS_BSP_INC_PATH} 
+set(RTEMS_ARCH_LIB_PATH ${RTEMS_ARCH_LIB_PATH} 
 	CACHE FILEPATH "Architecture library path"
 )
+set(RTEMS_ARCH_VERSION_NAME ${RTEMS_ARCH_VERSION_NAME} 
+	CACHE FILEPATH "Unique architecture-version identifier"
+)
+
+list(APPEND CMAKE_PREFIX_PATH ${RTEMS_BSP_LIB_PATH})
+list(APPEND CMAKE_PREFIX_PATH ${RTEMS_BSP_INC_PATH})
+list(APPEND CMAKE_PREFIX_PATH ${RTEMS_ARCH_LIB_PATH})
+list(APPEND CMAKE_PREFIX_PATH ${RTEMS_TOOLS_LIB_PATH})

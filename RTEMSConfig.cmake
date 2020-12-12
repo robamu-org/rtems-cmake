@@ -27,6 +27,11 @@
 # 3. RTEMS_PATH:
 #	 The user can provide this filepath variable if the RTEMS path (containg
 #    the BSPs) is not equal to the RTEMS prefix.
+# 4. RTEMS_VERBOSE:
+#    Verbose debug output for the CMake handling.
+# 5. RTEMS_SCAN_PKG_CONFIG:
+#    CMake will try to scan the pkgconfig file for the specified Architecture-
+#    Version-BSP combination to find the compiler and linker flags.
 # 
 # Any additional arguments will be passed on to the subfunctions here.
 
