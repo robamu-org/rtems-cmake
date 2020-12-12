@@ -73,6 +73,7 @@ endif()
 
 # Set flags from PKG files
 if(${RTEMS_BSP_CONFIG_FOUND})
+	message(STATUS "Configuring build flags from pkgconfig file..")
 
 	target_compile_options(${TARGET_NAME} PUBLIC
 		${RTEMS_BSP_CONFIG_CFLAGS}
@@ -85,6 +86,7 @@ if(${RTEMS_BSP_CONFIG_FOUND})
 
 # TODO: Maybe remove this section or export to separate file?
 else()
+	message(STATUS "Configuring build flags manually..")
 
 	# Set flags manually
 	if(RTEMS_BSP STREQUAL "arm/stm32h7")
