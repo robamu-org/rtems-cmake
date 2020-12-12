@@ -10,93 +10,164 @@
 #
 # The following paths should have been set and cached previously:
 #
-# 1. RTEMS_ARCH_LIB_PATH: Library path for the architecture
-# 2. RTEMS_BSP_LIB_PATH: Library path for the BSP
-# 3. RTEMS_BSP_INC_PATH: Include path for the BSP
+# 1. RTEMS_TOOLS: Path for the RTEMS tools
+# 2. RTEMS_PATH: Path for the RTEMS BSPs
+# 3. RTEMS_ARCH_LIB_PATH: Library path for the architecture
+# 4. RTEMS_BSP_LIB_PATH: Library path for the BSP
+# 5. RTEMS_BSP_INC_PATH: Include path for the BSP
+# 
+# Following variables change the behaviour of this function
+#
+# 1. RTEMS_SCAN_PKG_CONFIG: Default to TRUE (1). Attempt to scan pkg-config
+#    file to determine compiler and linker flags.
+# 2. RTEMS_VERBOSE: Default to FALSE (0) .
+#    Verbose debug output for the CMake handling.
 #
 # TODO: Maybe CMake can read the pkgconfig .pc files automatically?
 
 function(rtems_hw_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP)
 
-if(RTEMS_BSP STREQUAL "arm/stm32h7")
+option(RTEMS_SCAN_PKG_CONFIG 
+	"Attempt to scan PKG config file for compiler and linker flags" TRUE
+)
 
-	set(ABI_FLAGS 
-		-mthumb 
-		-mcpu=cortex-m7 
-		-mfpu=fpv5-d16
-		-mfloat-abi=hard
-	)
-	
-	target_compile_options(${TARGET_NAME} PUBLIC 
-		"${ABI_FLAGS}"
-	)
-	
-	target_include_directories(${TARGET_NAME} PUBLIC
-		${RTEMS_BSP_INC_PATH}
-	)
-	
-	target_link_options(${TARGET_NAME} BEFORE PUBLIC 
-		"${ABI_FLAGS}"
-	)
-	
-	target_link_options(${TARGET_NAME} PUBLIC
-		-Wl,--gc-sections
-		-Wl,-Bstatic
-		-Wl,-Bdynamic
-		-qrtems
-		-B${RTEMS_BSP_LIB_PATH}
-	)
+if(${RTEMS_SCAN_PKG_CONFIG})
 
-elseif(RTEMS_BSP STREQUAL "sparc/erc32")
+	message(STATUS "Trying to load PkgConfig module..")
+	find_package(PkgConfig)
 
-	# The options for RSB builds and RTEMS source build are different.. 
-	# This one is for the RSB build
-	if(EXISTS "${RTEMS_BSP_LIB_PATH}/bsp_specs")
+	set(RTEMS_PKG_MODULE_NAME "${RTEMS_ARCH_VERSION_NAME}-${RTEMS_BSP_NAME}")
+	set(RTEMS_PKG_MODULE_FILE_NAME "${RTEMS_PKG_MODULE_NAME}.pc")
+	set(RTEMS_PKG_FILE_PATH "${RTEMS_TOOLS_LIB_PATH}/pkgconfig")
 
-	target_compile_options(${TARGET_NAME} PUBLIC
-		-qrtems
-		-B${RTEMS_ARCH_LIB_PATH}
-		-B${RTEMS_BSP_LIB_PATH}
-		--specs bsp_specs
-		-mcpu=cypress
-		-ffunction-sections
-		-fdata-sections
-	)
+	if(IS_DIRECTORY "${RTEMS_PKG_FILE_PATH}")
+		list(APPEND CMAKE_PREFIX_PATH "${RTEMS_PKG_FILE_PATH}")
+		if(EXISTS "${RTEMS_PKG_FILE_PATH}/${RTEMS_PKG_MODULE_FILE_NAME}")
+			message(STATUS "PKG configuration file for given "
+				"architecture-version-BSP combination found.."
+			)
+		endif()
+	endif()
 	
-	target_link_options(${TARGET_NAME} PUBLIC
-		-B${RTEMS_ARCH_LIB_PATH}
-		-B${RTEMS_BSP_LIB_PATH}
-		-qrtems
-		--specs bsp_specs
-		-Wl,--gc-sections
-		-Wl,-Bstatic
-		-Wl,-Bdynamic
-	)
+	# Known bug: https://gitlab.kitware.com/cmake/cmake/-/issues/18150
+	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${RTEMS_PKG_FILE_PATH}")
+	pkg_check_modules(RTEMS_BSP_CONFIG "${RTEMS_PKG_MODULE_NAME}")
 
-	else()
+	if(${RTEMS_VERBOSE})
+		message(STATUS "PKG configuration file found: ${RTEMS_BSP_CONFIG_FOUND}")
+		message(STATUS "Libraries: ${RTEMS_BSP_CONFIG_LIBRARIES}")
+		message(STATUS "Link libraries: ${_RTEMS_BSP_CONFIGLINK_LIBRARIES}")
+		message(STATUS "Library directories: ${RTEMS_BSP_CONFIG_LIBRARY_DIRS}")
+		message(STATUS "LD flags: ${RTEMS_BSP_CONFIG_LDFLAGS}")
+		message(STATUS "LD flags (other): ${RTEMS_BSP_CONFIG_LDFLAGS_OTHER}")
+		message(STATUS "Include directories: ${RTEMS_BSP_CONFIG_INCLUDE_DIRS}")
+		message(STATUS "CFlags: ${RTEMS_BSP_CONFIG_CFLAGS}")
+		message(STATUS "CFlags (other): ${RTEMS_BSP_CONFIG_CFLAGS_OTHER}")
+	endif()
+	
+else()
 
-	target_compile_options(${TARGET_NAME} PUBLIC 
-		-mcpu=cypress
-	)
-	
-	target_include_directories(${TARGET_NAME} PUBLIC
-		${RTEMS_BSP_INC_PATH}
-	)
-	
-	target_link_options(${TARGET_NAME} PUBLIC
-		-qrtems
-		-B${RTEMS_BSP_LIB_PATH}
-		-Wl,--gc-sections
-	)
+	set(RTEMS_BSP_CONFIG_FOUND FALSE)
 
 endif()
 
+# Set flags from PKG files
+if(${RTEMS_BSP_CONFIG_FOUND})
+
+	target_compile_options(${TARGET_NAME} PUBLIC
+		${RTEMS_BSP_CONFIG_CFLAGS}
+	)
+
+	target_link_options(${TARGET_NAME} PUBLIC
+		${RTEMS_BSP_CONFIG_CFLAGS}
+		${RTEMS_BSP_CONFIG_LDFLAGS}
+	)
+
+# TODO: Maybe remove this section or export to separate file?
 else()
 
-	status(WARNING 
-		"The pkgconfig for this BSP still needs to be set up"
-		"transferred to RTEMSHardware.cmake!"
-	)
+	# Set flags manually
+	if(RTEMS_BSP STREQUAL "arm/stm32h7")
+
+		set(ABI_FLAGS 
+			-mthumb 
+			-mcpu=cortex-m7 
+			-mfpu=fpv5-d16
+			-mfloat-abi=hard
+		)
+	
+		target_compile_options(${TARGET_NAME} PUBLIC 
+			"${ABI_FLAGS}"
+		)
+	
+		target_include_directories(${TARGET_NAME} PUBLIC
+			${RTEMS_BSP_INC_PATH}
+		)
+	
+		target_link_options(${TARGET_NAME} BEFORE PUBLIC 
+			"${ABI_FLAGS}"
+		)
+	
+		target_link_options(${TARGET_NAME} PUBLIC
+			-Wl,--gc-sections
+			-Wl,-Bstatic
+			-Wl,-Bdynamic
+			-qrtems
+			-B${RTEMS_BSP_LIB_PATH}
+		)
+
+	elseif(RTEMS_BSP STREQUAL "sparc/erc32")
+
+		# The options for RSB builds and RTEMS source build are different.. 
+		# This one is for the RSB build
+		if(EXISTS "${RTEMS_BSP_LIB_PATH}/bsp_specs")
+
+			target_compile_options(${TARGET_NAME} PUBLIC
+				-qrtems
+				-B${RTEMS_ARCH_LIB_PATH}
+				-B${RTEMS_BSP_LIB_PATH}
+				--specs bsp_specs
+				-mcpu=cypress
+				-ffunction-sections
+				-fdata-sections
+			)
+	
+			target_link_options(${TARGET_NAME} PUBLIC
+				-B${RTEMS_ARCH_LIB_PATH}
+				-B${RTEMS_BSP_LIB_PATH}
+				-qrtems
+				--specs bsp_specs
+				-Wl,--gc-sections
+				-Wl,-Bstatic
+				-Wl,-Bdynamic
+			)
+
+		else()
+
+			target_compile_options(${TARGET_NAME} PUBLIC 
+				-mcpu=cypress
+			)
+	
+			target_include_directories(${TARGET_NAME} PUBLIC
+				${RTEMS_BSP_INC_PATH}
+			)
+	
+			target_link_options(${TARGET_NAME} PUBLIC
+				-qrtems
+				-B${RTEMS_BSP_LIB_PATH}
+				-Wl,--gc-sections
+			)
+
+		endif()
+
+	else()
+
+		status(WARNING 
+			"The pkgconfig for this BSP still needs to be set up"
+			"transferred to RTEMSHardware.cmake!"
+		)
+
+	endif()
 
 endif()
 

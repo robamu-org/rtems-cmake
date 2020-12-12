@@ -27,6 +27,8 @@
 # 3. RTEMS_PATH:
 #	 The user can provide this filepath variable if the RTEMS path (containg
 #    the BSPs) is not equal to the RTEMS prefix.
+# 4. RTEMS_VERBOSE:
+#    Verbose debug output for the CMake handling.
 # 
 # Any additional arguments will be passed on to the subfunctions here.
 
