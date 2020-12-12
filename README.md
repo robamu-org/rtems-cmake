@@ -22,6 +22,19 @@ set(RTEMS_CONFIG_DIR
 )
 ```
 
+It is also recommended to add the following lines before the `project()` call in
+the application `CMakeLists.txt`:
+
+```sh
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+set(CMAKE_CROSSCOMPILING 1)
+```
+
+This will disable the compiler checks for the standard C/C++ compiler.
+
+
 If this repository was cloned inside the application root, the path can be 
 set to `${CMAKE_CURRENT_SOURCE_DIRECTORY}`.
 
