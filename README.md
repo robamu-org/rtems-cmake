@@ -47,7 +47,7 @@ include("${RTEMS_CONFIG_DIR}/RTEMSConfig.cmake")
 And then call the configuration function:
 
 ```sh
-rtems_general_config(${CMAKE_PROJECT_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP})
+rtems_general_config(<TargetName> <RTEMS Prefix> <RTEMS BSP>)
 ```
 
 This function will call the the `rtems_generic_config` function internally to set up the cross-compiler, using the provided RTEMS prefix and the BSP name,
