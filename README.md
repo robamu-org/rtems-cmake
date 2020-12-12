@@ -36,7 +36,7 @@ This will disable the compiler checks for the standard C/C++ compiler.
 
 
 If this repository was cloned inside the application root, the path can be 
-set to `${CMAKE_CURRENT_SOURCE_DIRECTORY}`.
+set to `${CMAKE_CURRENT_SOURCE_DIRECTORY}/rtems-cmake`.
 
 After that, include the general configuration file with the following line:
 
