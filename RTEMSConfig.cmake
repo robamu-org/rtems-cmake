@@ -14,22 +14,25 @@
 #    the RTEMS_BSP variable.
 #
 # Other variables which can be provided by the developer via command line
-# as well:
+# or in the application CMake file as well:
 #
-# 1. RTEMS_VERSION:
+# 1. RTEMS_CONFIG_DIR: The application will assume that all other configuration
+#    files are located in this path or relative to this path. If this is not set
+#    it will be set to the ${CMAKE_CURRENT_SOURCE_DIR}/rtems-cmake
+# 2. RTEMS_VERSION:
 #    The user can supply RTEMS_VERSION to specify the RTEMS version
 #    manually. This is required to determine the toolchains to use. If no
 #    RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
 #    RTEMS version from the supplied tools path.
-# 2. RTEMS_TOOLS:
+# 3. RTEMS_TOOLS:
 #	 The user can provide this filepath variable if the RTEMS tools path is 
 #    not equal to the RTEMS prefix.
-# 3. RTEMS_PATH:
+# 4. RTEMS_PATH:
 #	 The user can provide this filepath variable if the RTEMS path (containg
 #    the BSPs) is not equal to the RTEMS prefix.
-# 4. RTEMS_VERBOSE:
+# 5. RTEMS_VERBOSE:
 #    Verbose debug output for the CMake handling.
-# 5. RTEMS_SCAN_PKG_CONFIG:
+# 6. RTEMS_SCAN_PKG_CONFIG:
 #    CMake will try to scan the pkgconfig file for the specified Architecture-
 #    Version-BSP combination to find the compiler and linker flags.
 # 
@@ -37,7 +40,16 @@
 
 function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 
-	include(${RTEMS_CONFIG_DIRECTORY}/RTEMSGeneric.cmake)
+	message(STATUS ${RTEMS_CONFIG_DIR})
+	if(NOT RTEMS_CONFIG_DIR) 
+		message(STATUS 
+			"RTEMS_CONFIG_DIR not set. Assuming  the CMake support was "
+			"cloned in the application source directory.."
+		)
+		set(RTEMS_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rtems-cmake)
+	endif()
+	
+	include(${RTEMS_CONFIG_DIR}/RTEMSGeneric.cmake)
 	rtems_generic_config(${TARGET_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP_PAIR} ${ARGN})
 	
 	# Not an ideal solution but it will do for now because the number of 
@@ -57,7 +69,7 @@ function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 		set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} PARENT_SCOPE)
 	endif()
 	
-	include(${RTEMS_CONFIG_DIRECTORY}/RTEMSHardware.cmake)
+	include(${RTEMS_CONFIG_DIR}/RTEMSHardware.cmake)
 	rtems_hw_config(${TARGET_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP_PAIR} ${ARGN})
 
 	# No propagation necessary here because we can use target specific settings.

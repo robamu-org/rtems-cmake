@@ -1,15 +1,60 @@
-# rtems-cmake
+# RTEMS CMake Build Support
 
-This repostiory contains the first version of a possible RTEMS CMake build aupport. The intention is to export the RTEMS specific configuration of the cross compiler toolchain and the flags to external `*.cmake` files so the application `CMakeLists.txt` can stay clean, similarly to the `rtems_waf` support.
+This repostiory contains the first version of a possible RTEMS CMake build aupport. The intention is to provide most CMake configuration to perform cross-compiling of RTEMS applications and provide a decent starting point for developers which would like to use RTEMS. The support has been written as generic as possible.
+
+This is still a prototype. Simple applications have been tested, but it has not been attempted to link an additional library for an application yet.
 
 ## How to use
 
-Include the `RTEMSGeneric.cmake` file in CMake and call the `rtems_generic_config` function, passing the RTEMS installation path (also commonly called prefix)
+Clone this repository. This does not necesarilly have to be in the application root path, but the RTEMS configuration path (the folder containing the `*.cmake` files) needs to be specified in this case.
+
+```sh
+git clone https://github.com/rmspacefish/rtems-cmake.git
+```
+
+After that, it is recommended to set the path to the RTEMS CMake support with the 
+following line in the application `CMakeLists.txt`
+
+```sh
+set(RTEMS_CONFIG_DIR
+	"<Path to RTEMS CMake support folder>"
+	 CACHE FILEPATH "Directory containing the RTEMS *.cmake files"
+)
+```
+
+If this repository was cloned inside the application root, the path can be 
+set to `${CMAKE_CURRENT_SOURCE_DIRECTORY}`.
+
+After that, include the general configuration file with the following line:
+
+```sh
+include("${RTEMS_CONFIG_DIR}/RTEMSConfig.cmake")
+```
+
+And then call the configuration function:
+
+```sh
+rtems_general_config(${CMAKE_PROJECT_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP})
+```
+
+This function will call the the `rtems_generic_config` function internally to set up the cross-compiler, using the provided RTEMS prefix and the BSP name,
 and the RTEMS BSP (e.g. sparc/erc32) to this function.
+
+After that, it will call the the function `rtems_hw_config` which will assign necessary compiler and linker flags to the provided target.
+
+## Optional configuration of the CMake support
+
+The RTEMS CMake build support can be configured either by passing configuration options prepended with `-D` to the build command or by setting these build variables in the application `CMakeLists.txt` before calling the build support. Following options are available
+
+ - `RTEMS_VERSION`: Can be specified manually. If this is not specified, the CMake build support will attempt to extract the version number from the RTEMS prefix (last letter of path). This variable needs to be valid for the RTEMS support to work!
+ - `RTEMS_VERBOSE`: Enable additional diagnostic output.
+ - `RTEMS_SCAN_PKG_CONFIG`: The RTEMS CMake support will try to read the pkgconfig files to extract compile and link flag options.
+ - `RTEMS_TOOLS`: Can be specified if the RTEMS tools folder. Can be different from the prefix but will be equal to the prefix for most users.
+ - `RTEMS_PATH`: Folder containing the RTEMS installation (BSPs). Can be different from the prefix but will be equal to the prefix for most users.
 
 ## Extending the build system support
 
-This is still a prototype. It has been tested for the Hello World demo from the RTEMS quick start guide which uses the `sparc/erc32` BSP and for a STM32 blinky using the `arm/stm32h7` BSP.
+It is possible to read the pkfconfig files now, so extending the manual build configuration might not be necessary in the future.
 
 Extending the build support is relatively easy: 
 
