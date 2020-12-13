@@ -1,43 +1,13 @@
 ################################################################################
-# Generic RTEMS configuration
+# Generic Toolchain configuration
 ################################################################################
 
-# This function performs the generic RTEMS configuration. Following function
-# arguments are mandatory:
-#
-# 1. Target/executable name
-# 2. RTEMS prefix. This is generally the path where the RTEMS tools and BSPs
-#    are installed. More experienced users can use multiple prefixes.
-#	 This value will be cached inside the RTEMS_PREFIX variable.
-# 3. RTEMS BSP pair name, which consists generally has the 
-#    format <Architecture>/<BSP>. This variable will be cached inside
-#    the RTEMS_BSP variable.
-#
-# Other variables which can be provided by the developer via command line
-# as well:
-#
-# 1. RTEMS_VERSION:
-#    The user can supply RTEMS_VERSION to specify the RTEMS version
-#    manually. This is required to determine the toolchains to use. If no
-#    RTEMS_VERSION is supplied, this CMake file will try to autodetermine the 
-#    RTEMS version from the supplied tools path.
-# 2. RTEMS_TOOLS:
-#	 The user can provide this filepath variable if the RTEMS tools path is 
-#    not equal to the RTEMS prefix.
-# 3. RTEMS_PATH:
-#	 The user can provide this filepath variable if the RTEMS path (containig
-#    the BSPs) is not equal to the RTEMS prefix.
+# This file can be loaded with -DCMAKE_TOOLCHAIN_FILE, but we need to
+# disable the checks anyway.. RTEMSConfig.make prefered for now.
 
-function(rtems_generic_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
-
-set (EXTRA_RTEMS_ARGS ${ARGN})
-list(LENGTH EXTRA_RTEMS_ARGS NUM_EXTRA_RTEMS_ARGS)
-
-if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
-	# This only works for one optional arguments! Need to write list to 
-	# single variables if this is extended.
-	set(RTEMS_PATH ${EXTRA_RTEMS_ARGS})
-endif()
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
+set(CMAKE_CROSSCOMPILING 1)
 
 set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
 set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP pair")
@@ -203,11 +173,10 @@ endif()
 # Setting variables in upper scope (only the upper scope!)
 ###############################################################################
 
-set(CMAKE_C_COMPILER ${RTEMS_GCC} PARENT_SCOPE)
-set(CMAKE_CXX_COMPILER ${RTEMS_GXX} PARENT_SCOPE)
-set(CMAKE_ASM_COMPILER ${RTEMS_ASM} PARENT_SCOPE)
-set(CMAKE_LINKER ${RTEMS_LINKER} PARENT_SCOPE)
-set(RTEMS_OBJCOPY ${RTEMS_GCC}-objcopy PARENT_SCOPE)
+set(CMAKE_C_COMPILER ${RTEMS_GCC})
+set(CMAKE_CXX_COMPILER ${RTEMS_GXX})
+set(CMAKE_ASM_COMPILER ${RTEMS_ASM})
+set(CMAKE_LINKER ${RTEMS_LINKER})
 
 # Variables set in the cache so they can be used everywhere.
 set(RTEMS_ARCH_NAME ${RTEMS_ARCH_NAME} CACHE FILEPATH "Architecture name")
@@ -228,7 +197,3 @@ list(APPEND CMAKE_PREFIX_PATH ${RTEMS_BSP_LIB_PATH})
 list(APPEND CMAKE_PREFIX_PATH ${RTEMS_BSP_INC_PATH})
 list(APPEND CMAKE_PREFIX_PATH ${RTEMS_ARCH_LIB_PATH})
 list(APPEND CMAKE_PREFIX_PATH ${RTEMS_TOOLS_LIB_PATH})
-
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} PARENT_SCOPE)
-
-endfunction()
