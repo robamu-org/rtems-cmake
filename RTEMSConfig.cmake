@@ -40,7 +40,6 @@
 
 function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 
-	message(STATUS ${RTEMS_CONFIG_DIR})
 	if(NOT RTEMS_CONFIG_DIR) 
 		message(STATUS 
 			"RTEMS_CONFIG_DIR not set. Assuming  the CMake support was "

@@ -53,7 +53,22 @@ if(${RTEMS_SCAN_PKG_CONFIG})
 	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${RTEMS_PKG_FILE_PATH}")
 	pkg_check_modules(RTEMS_BSP_CONFIG "${RTEMS_PKG_MODULE_NAME}")
 
+	pkg_get_variable(RTEMS_BSP_CONFIG_PREFIX 
+		"${RTEMS_PKG_MODULE_NAME}" "prefix"
+	)
+	if(NOT "${RTEMS_BSP_CONFIG_PREFIX}" MATCHES "${RTEMS_PREFIX_ABS}")
+		message(WARNING 
+			"Specified RTEMS prefix and prefix read from "
+			"pkgconfig are different!"
+		)
+		message(WARNING 
+			"Consider adapting the pkg-config file manually if "
+			"the toolchain has moved and the build fails."
+		)
+	endif()
+	
 	if(${RTEMS_VERBOSE})
+		message(STATUS "PKG prefix: ${RTEMS_BSP_CONFIG_PREFIX}")
 		message(STATUS "PKG configuration file found: ${RTEMS_BSP_CONFIG_FOUND}")
 		message(STATUS "Libraries: ${RTEMS_BSP_CONFIG_LIBRARIES}")
 		message(STATUS "Link libraries: ${_RTEMS_BSP_CONFIGLINK_LIBRARIES}")

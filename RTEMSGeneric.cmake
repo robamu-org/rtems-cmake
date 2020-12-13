@@ -39,8 +39,20 @@ if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
 	set(RTEMS_PATH ${EXTRA_RTEMS_ARGS})
 endif()
 
+if(NOT RTEMS_PREFIX)
+	status(WARNING "No RTEMS prefix supplied!")
+endif()
+
+
 set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
+get_filename_component(RTEMS_PREFIX "${RTEMS_PREFIX}" ABSOLUTE)
+set(RTEMS_PREFIX_ABS ${RTEMS_PREFIX} CACHE FILEPATH 
+	"RTEMS prefix (absolute path)"
+)
+	
 set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP pair")
+
+
 option(RTEMS_VERBOSE "Verbose output for the RTEMS CMake support" FALSE)
 
 set(RTEMS_INSTALL 
