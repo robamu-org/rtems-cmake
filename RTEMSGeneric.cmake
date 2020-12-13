@@ -186,7 +186,15 @@ if(NOT EXISTS "${RTEMS_LINKER}")
 		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld")
 endif()
 
-message(STATUS "Checking done")
+message(STATUS "Checking for RTEMS objcopy..")
+set(RTEMS_OBJCOPY "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy")
+if(NOT EXISTS "${RTEMS_OBJCOPY}")
+	message(WARNING
+		"RTEMS ld linker  not found at "
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy")
+endif()
+
+message(STATUS "Checking done.")
 
 ############################################
 # Info output
@@ -206,6 +214,7 @@ message(STATUS "RTEMS gcc compiler: ${RTEMS_GCC}")
 message(STATUS "RTEMS g++ compiler: ${RTEMS_GXX}")
 message(STATUS "RTEMS assembler: ${RTEMS_ASM}")
 message(STATUS "RTEMS linker: ${RTEMS_LINKER}")
+message(STATUS "RTEMS objcopy: ${RTEMS_OBJCOPY}")
 
 if(${RTEMS_ARCH_NAME} STREQUAL "arm")
     set(CMAKE_SYSTEM_PROCESSOR arm PARENT_SCOPE)
@@ -219,7 +228,7 @@ set(CMAKE_C_COMPILER ${RTEMS_GCC} PARENT_SCOPE)
 set(CMAKE_CXX_COMPILER ${RTEMS_GXX} PARENT_SCOPE)
 set(CMAKE_ASM_COMPILER ${RTEMS_ASM} PARENT_SCOPE)
 set(CMAKE_LINKER ${RTEMS_LINKER} PARENT_SCOPE)
-set(RTEMS_OBJCOPY ${RTEMS_GCC}-objcopy PARENT_SCOPE)
+set(RTEMS_OBJCOPY ${RTEMS_OBJCOPY} PARENT_SCOPE)
 
 # Variables set in the cache so they can be used everywhere.
 set(RTEMS_ARCH_NAME ${RTEMS_ARCH_NAME} CACHE FILEPATH "Architecture name")
