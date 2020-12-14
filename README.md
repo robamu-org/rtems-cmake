@@ -1,6 +1,6 @@
 # RTEMS CMake Build Support
 
-This repostiory contains the first version of a possible RTEMS CMake build aupport. The intention is to provide most CMake configuration to perform cross-compiling of RTEMS applications and provide a decent starting point for developers which would like to use RTEMS. The support has been written as generic as possible.
+This repository contains the first version of a possible RTEMS CMake build aupport. The intention is to provide most CMake configuration to perform cross-compiling of RTEMS applications and provide a decent starting point for developers which would like to build their RTEMS application with CMake. The support has been written as generic as possible.
 
 This is still a prototype. Simple applications have been tested, but it has not been attempted to link an additional library for an application yet.
 
@@ -36,7 +36,7 @@ This will disable the compiler checks for the standard C/C++ compiler.
 
 
 If this repository was cloned inside the application root, the path can be 
-set to `${CMAKE_CURRENT_SOURCE_DIRECTORY}`.
+set to `${CMAKE_CURRENT_SOURCE_DIRECTORY}/rtems-cmake`.
 
 After that, include the general configuration file with the following line:
 
@@ -47,7 +47,7 @@ include("${RTEMS_CONFIG_DIR}/RTEMSConfig.cmake")
 And then call the configuration function:
 
 ```sh
-rtems_general_config(${CMAKE_PROJECT_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP})
+rtems_general_config(<TargetName> <RTEMS Prefix> <RTEMS BSP>)
 ```
 
 This function will call the the `rtems_generic_config` function internally to set up the cross-compiler, using the provided RTEMS prefix and the BSP name,

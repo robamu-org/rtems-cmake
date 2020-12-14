@@ -39,8 +39,20 @@ if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
 	set(RTEMS_PATH ${EXTRA_RTEMS_ARGS})
 endif()
 
+if(NOT RTEMS_PREFIX)
+	status(WARNING "No RTEMS prefix supplied!")
+endif()
+
+
 set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
+get_filename_component(RTEMS_PREFIX "${RTEMS_PREFIX}" ABSOLUTE)
+set(RTEMS_PREFIX_ABS ${RTEMS_PREFIX} CACHE FILEPATH 
+	"RTEMS prefix (absolute path)"
+)
+	
 set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP pair")
+
+
 option(RTEMS_VERBOSE "Verbose output for the RTEMS CMake support" FALSE)
 
 set(RTEMS_INSTALL 
@@ -174,7 +186,23 @@ if(NOT EXISTS "${RTEMS_LINKER}")
 		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld")
 endif()
 
-message(STATUS "Checking done")
+message(STATUS "Checking for RTEMS objcopy utility..")
+set(RTEMS_OBJCOPY "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy")
+if(NOT EXISTS "${RTEMS_OBJCOPY}")
+	message(WARNING
+		"RTEMS ld linker  not found at "
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy")
+endif()
+
+message(STATUS "Checking for RTEMS size utility..")
+set(RTEMS_SIZE "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-size")
+if(NOT EXISTS "${RTEMS_SIZE}")
+	message(WARNING
+		"RTEMS ld linker  not found at "
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-size")
+endif()
+
+message(STATUS "Checking done.")
 
 ############################################
 # Info output
@@ -194,6 +222,9 @@ message(STATUS "RTEMS gcc compiler: ${RTEMS_GCC}")
 message(STATUS "RTEMS g++ compiler: ${RTEMS_GXX}")
 message(STATUS "RTEMS assembler: ${RTEMS_ASM}")
 message(STATUS "RTEMS linker: ${RTEMS_LINKER}")
+message(STATUS "RTEMS objcopy: ${RTEMS_OBJCOPY}")
+message(STATUS "RTEMS objcopy: ${RTEMS_SIZE}")
+
 
 if(${RTEMS_ARCH_NAME} STREQUAL "arm")
     set(CMAKE_SYSTEM_PROCESSOR arm PARENT_SCOPE)
@@ -207,6 +238,8 @@ set(CMAKE_C_COMPILER ${RTEMS_GCC} PARENT_SCOPE)
 set(CMAKE_CXX_COMPILER ${RTEMS_GXX} PARENT_SCOPE)
 set(CMAKE_ASM_COMPILER ${RTEMS_ASM} PARENT_SCOPE)
 set(CMAKE_LINKER ${RTEMS_LINKER} PARENT_SCOPE)
+set(RTEMS_OBJCOPY ${RTEMS_OBJCOPY} CACHE FILEPATH "RTEMS objcopy utilits")
+set(RTEMS_SIZE ${RTEMS_SIZE} CACHE FILEPATH "RTEMS size utility")
 
 # Variables set in the cache so they can be used everywhere.
 set(RTEMS_ARCH_NAME ${RTEMS_ARCH_NAME} CACHE FILEPATH "Architecture name")
