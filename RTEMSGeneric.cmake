@@ -24,7 +24,7 @@
 # 2. RTEMS_TOOLS:
 #	 The user can provide this filepath variable if the RTEMS tools path is 
 #    not equal to the RTEMS prefix.
-# 3. RTEMS_PATH:
+# 3. RTEMS:
 #	 The user can provide this filepath variable if the RTEMS path (containig
 #    the BSPs) is not equal to the RTEMS prefix.
 
@@ -36,7 +36,7 @@ list(LENGTH EXTRA_RTEMS_ARGS NUM_EXTRA_RTEMS_ARGS)
 if (${NUM_EXTRA_RTEMS_ARGS} EQUAL 1)
 	# This only works for one optional arguments! Need to write list to 
 	# single variables if this is extended.
-	set(RTEMS_PATH ${EXTRA_RTEMS_ARGS})
+	set(RTEMS ${EXTRA_RTEMS_ARGS})
 endif()
 
 if(NOT RTEMS_PREFIX)
@@ -60,13 +60,13 @@ set(RTEMS_INSTALL
 	CACHE FILEPATH "RTEMS install destination"
 )
 
-if(NOT RTEMS_PATH)
+if(NOT RTEMS)
 	message(STATUS 
 		"RTEMS path was not specified and was set to RTEMS prefix."
 	)
-	set(RTEMS_PATH ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS folder")
+	set(RTEMS ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS folder")
 #else()
-#	set(RTEMS_PATH ${RTEMS_PATH} CACHE FILEPATH "RTEMS path folder")
+#	set(RTEMS ${RTEMS} CACHE FILEPATH "RTEMS path folder")
 endif()
 
 if(NOT RTEMS_TOOLS)
@@ -114,7 +114,7 @@ endif()
 set(RTEMS_ARCH_LIB_PATH "${RTEMS_TOOLS}/${RTEMS_ARCH_VERSION_NAME}/lib")
 set(RTEMS_TOOLS_LIB_PATH "${RTEMS_TOOLS}/lib")
 
-set(RTEMS_BSP_PATH "${RTEMS_PATH}/${RTEMS_ARCH_VERSION_NAME}/${RTEMS_BSP_NAME}")
+set(RTEMS_BSP_PATH "${RTEMS}/${RTEMS_ARCH_VERSION_NAME}/${RTEMS_BSP_NAME}")
 if(NOT IS_DIRECTORY ${RTEMS_BSP_PATH})
 	message(STATUS 
 		"Supplied or autodetermined BSP path "
@@ -213,7 +213,7 @@ message(STATUS "RTEMS prefix: ${RTEMS_PREFIX}")
 message(STATUS "RTEMS tools path: ${RTEMS_TOOLS}")
 message(STATUS "RTEMS BSP pair: ${RTEMS_BSP}")
 message(STATUS "RTEMS architecture tools path: "
-	"${RTEMS_PATH}/${RTEMS_ARCH_VERSION_NAME}")
+	"${RTEMS}/${RTEMS_ARCH_VERSION_NAME}")
 message(STATUS "RTEMS BSP library path: ${RTEMS_BSP_LIB_PATH}")
 message(STATUS "RTEMS BSP include path: ${RTEMS_BSP_INC_PATH}")
 message(STATUS "RTEMS install target: ${RTEMS_INSTALL}")

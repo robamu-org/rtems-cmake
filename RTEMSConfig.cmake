@@ -27,7 +27,7 @@
 # 3. RTEMS_TOOLS:
 #	 The user can provide this filepath variable if the RTEMS tools path is 
 #    not equal to the RTEMS prefix.
-# 4. RTEMS_PATH:
+# 4. RTEMS:
 #	 The user can provide this filepath variable if the RTEMS path (containg
 #    the BSPs) is not equal to the RTEMS prefix.
 # 5. RTEMS_VERBOSE:
