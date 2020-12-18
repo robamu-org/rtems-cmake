@@ -65,8 +65,6 @@ if(NOT RTEMS)
 		"RTEMS path was not specified and was set to RTEMS prefix."
 	)
 	set(RTEMS ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS folder")
-#else()
-#	set(RTEMS ${RTEMS} CACHE FILEPATH "RTEMS path folder")
 endif()
 
 if(NOT RTEMS_TOOLS)
@@ -74,8 +72,6 @@ if(NOT RTEMS_TOOLS)
 		"RTEMS toolchain path was not specified and was set to RTEMS prefix."
 	)
 	set(RTEMS_TOOLS ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS tools folder")
-#else()
-#	set(RTEMS_TOOLS ${RTEMS_TOOLS} CACHE FILEPATH "RTEMS tools folder")
 endif()
 
 if(NOT RTEMS_VERSION)
@@ -146,8 +142,8 @@ endif()
 # Checking the toolchain
 ################################################################################
 
-if(WIN32)
-set(WIN_SUFFIX ".exe")
+if(CMAKE_HOST_WIN32)
+	set(WIN_SUFFIX ".exe")
 endif()
 
 message(STATUS "Checking for RTEMS binaries folder..")

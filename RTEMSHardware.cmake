@@ -52,7 +52,7 @@ if(${RTEMS_SCAN_PKG_CONFIG})
 	# Known bug: https://gitlab.kitware.com/cmake/cmake/-/issues/18150
 	
 	# Ugly solution, but have not found better way yet.
-	if(WIN32)
+	if(CMAKE_HOST_WIN32)
 		set(PATH_SEPARATOR ";")
 	else()
 		set(PATH_SEPARATOR ":")

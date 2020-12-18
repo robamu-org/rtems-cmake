@@ -57,7 +57,6 @@ function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 	# We could also use CMAKE_TOOLCHAIN_FILE but this way works as well and we 
 	# dont have to supply the file each time, we can set the location in
 	# the uppermost CMakeLists.txt once.
-
 	set(CMAKE_C_COMPILER ${CMAKE_C_COMPILER} PARENT_SCOPE)
 	set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} PARENT_SCOPE)
 	set(CMAKE_ASM_COMPILER ${CMAKE_ASM_COMPILER} PARENT_SCOPE)
