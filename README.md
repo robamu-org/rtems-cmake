@@ -3,6 +3,7 @@
 This repository contains the first version of a possible RTEMS CMake build support. The intention is to provide most CMake configuration to perform cross-compiling of RTEMS applications and provide a decent starting point for developers which would like to build their RTEMS application with CMake. The support has been written as generic as possible.
 
 This is still a prototype. Simple applications have been tested, but it has not been attempted to link an additional library for an application yet.
+The compilation of simple applications was tested on Windows 10 and Ubuntu 20.04
 
 ## How to use
 
@@ -22,8 +23,8 @@ set(RTEMS_CONFIG_DIR
 )
 ```
 
-It is also recommended to add the following lines before the `project()` call in
-the application `CMakeLists.txt`:
+It is also recommended (and necessary on Windows) to add the following lines before 
+the `project()` call in the application `CMakeLists.txt`:
 
 ```sh
 set(CMAKE_SYSTEM_NAME Generic)
@@ -52,6 +53,9 @@ rtems_general_config(<TargetName> <RTEMS Prefix> <RTEMS BSP>)
 
 This function will call the the `rtems_generic_config` function internally to set up the cross-compiler, using the provided RTEMS prefix and the BSP name,
 and the RTEMS BSP (e.g. sparc/erc32) to this function.
+
+It is recommended to either hardcode mandatory values like the prefix and BSP path in the application `CMakeLists.txt`
+(especially when using the CMake GUI) or to supply them via command line and write scripts to ease this process.
 
 After that, it will call the the function `rtems_hw_config` which will assign necessary compiler and linker flags to the provided target.
 
