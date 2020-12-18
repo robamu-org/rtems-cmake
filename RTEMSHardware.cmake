@@ -50,7 +50,19 @@ if(${RTEMS_SCAN_PKG_CONFIG})
 	endif()
 	
 	# Known bug: https://gitlab.kitware.com/cmake/cmake/-/issues/18150
-	set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${RTEMS_PKG_FILE_PATH}")
+	
+	# Ugly solution, but have not found better way yet.
+	if(WIN32)
+		set(PATH_SEPARATOR ";")
+	else()
+		set(PATH_SEPARATOR ":")
+	endif()
+	
+	set(ENV{PKG_CONFIG_PATH} 
+		"$ENV{PKG_CONFIG_PATH}${PATH_SEPARATOR}${RTEMS_PKG_FILE_PATH}"
+	)
+	
+	message(STATUS $ENV{PKG_CONFIG_PATH})
 	pkg_check_modules(RTEMS_BSP_CONFIG "${RTEMS_PKG_MODULE_NAME}")
 
 	pkg_get_variable(RTEMS_BSP_CONFIG_PREFIX 
@@ -65,6 +77,8 @@ if(${RTEMS_SCAN_PKG_CONFIG})
 			"Consider adapting the pkg-config file manually if "
 			"the toolchain has moved and the build fails."
 		)
+		message(STATUS "PKG Prefix: ${RTEMS_BSP_CONFIG_PREFIX}")
+		message(STATUS "Specified prefix: ${RTEMS_PREFIX_ABS}")
 	endif()
 	
 	if(${RTEMS_VERBOSE})

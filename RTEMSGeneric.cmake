@@ -146,6 +146,10 @@ endif()
 # Checking the toolchain
 ################################################################################
 
+if(WIN32)
+set(WIN_SUFFIX ".exe")
+endif()
+
 message(STATUS "Checking for RTEMS binaries folder..")
 set(RTEMS_BIN_PATH "${RTEMS_TOOLS}/bin")
 if(NOT IS_DIRECTORY "${RTEMS_BIN_PATH}")
@@ -153,53 +157,53 @@ if(NOT IS_DIRECTORY "${RTEMS_BIN_PATH}")
 endif()
 
 message(STATUS "Checking for RTEMS gcc..")
-set(RTEMS_GCC "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-gcc")
+set(RTEMS_GCC "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-gcc${WIN_SUFFIX}")
 if(NOT EXISTS "${RTEMS_GCC}") 
 	message(FATAL_ERROR 
 		"RTEMS gcc compiler not found at "
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-gcc"
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-gcc${WIN_SUFFIX}"
 	)
 endif()
 
 message(STATUS "Checking for RTEMS g++..")
-set(RTEMS_GXX "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-g++")
+set(RTEMS_GXX "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-g++${WIN_SUFFIX}")
 if(NOT EXISTS "${RTEMS_GXX}")
 	message(FATAL_ERROR 
 		"RTEMS g++ compiler not found at " 
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-g++"
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-g++${WIN_SUFFIX}"
 	)
 endif()
 
 message(STATUS "Checking for RTEMS assembler..")
-set(RTEMS_ASM "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-as")
+set(RTEMS_ASM "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-as${WIN_SUFFIX}")
 if(NOT EXISTS "${RTEMS_GXX}")
 	message(FATAL_ERROR 
 		"RTEMS as compiler not found at " 
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-as")
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-as${WIN_SUFFIX}")
 endif()
 
 message(STATUS "Checking for RTEMS linker..")
-set(RTEMS_LINKER "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld")
+set(RTEMS_LINKER "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld${WIN_SUFFIX}")
 if(NOT EXISTS "${RTEMS_LINKER}")
 	message(FATAL_ERROR 
 		"RTEMS ld linker  not found at "
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld")
+		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-ld${WIN_SUFFIX}")
 endif()
 
 message(STATUS "Checking for RTEMS objcopy utility..")
-set(RTEMS_OBJCOPY "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy")
+set(RTEMS_OBJCOPY 
+	"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy${WIN_SUFFIX}"
+)
 if(NOT EXISTS "${RTEMS_OBJCOPY}")
 	message(WARNING
-		"RTEMS ld linker  not found at "
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-objcopy")
+		"RTEMS ld linker  not found at ${RTEMS_OBJCOPY}")
 endif()
 
 message(STATUS "Checking for RTEMS size utility..")
-set(RTEMS_SIZE "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-size")
+set(RTEMS_SIZE "${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-size${WIN_SUFFIX}")
 if(NOT EXISTS "${RTEMS_SIZE}")
 	message(WARNING
-		"RTEMS ld linker  not found at "
-		"${RTEMS_BIN_PATH}/${RTEMS_ARCH_VERSION_NAME}-size")
+		"RTEMS ld linker  not found at ${RTEMS_SIZE}")
 endif()
 
 message(STATUS "Checking done.")
