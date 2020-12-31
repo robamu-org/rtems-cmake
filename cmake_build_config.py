@@ -19,8 +19,8 @@ def main():
     print("Parsing command line arguments..")
     parser = argparse.ArgumentParser(description="Processing arguments for CMake build configuration.")
     parser.add_argument("-b", "--buildtype", type=str, choices=["debug", "release", "size", "reldeb"],
-                        help="CMake build type. Valid arguments: debug, release, size, reldeb (Release with Debug "
-                             "Information)", default="debug")
+                        help="CMake build type. Valid arguments: debug, release, size, reldeb "
+                             "(Release with Debug Information)", default="debug")
     parser.add_argument("-l", "--builddir", type=str, help="Specify build directory.")
     parser.add_argument("-g", "--generator", type=str, help="CMake Generator")
     parser.add_argument("-p", "--prefix", type=str, help="RTEMS prefix")
@@ -60,7 +60,14 @@ def main():
     if args.rtems_bsp is not None:
         cmake_rtems_bsp = f"-DRTEMS_BSP=\"{args.rtems_bsp}\""
     else:
-        cmake_rtems_bsp = ""
+        print("Error: RTEMS BSP has to be specified!")
+        sys.exit(1)
+
+    if args.prefix is not None:
+        rtems_prefix = args.prefix
+    else:
+        print("Error: RTEMS prefix has to be specified!")
+        sys.exit(1)
 
     define_string = ""
     if args.defines is not None:
@@ -88,7 +95,7 @@ def main():
     os.chdir(build_folder)
 
     cmake_command = f"cmake {generator_cmake_arg} -DCMAKE_BUILD_TYPE=\"{cmake_build_type}\" " \
-                    f"{cmake_rtems_bsp} {define_string} {source_location}"
+                    f"{cmake_rtems_bsp} {rtems_prefix} {define_string} {source_location}"
     # Remove redundant spaces
     cmake_command = ' '.join(cmake_command.split())
     print("Running CMake command: ")
