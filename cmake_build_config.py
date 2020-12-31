@@ -111,15 +111,5 @@ def main():
     print("-- CMake configuration done. --")
 
 
-def determine_new_folder() -> str:
-    new_folder = input(f"Use different folder name? [y/n]: ")
-    if str(new_folder).lower() in ["yes", "y", 1]:
-        new_folder_name = input("New folder name: ")
-        return new_folder_name
-    else:
-        print("Aborting configuration.")
-        sys.exit(0)
-
-
 if __name__ == "__main__":
     main()
