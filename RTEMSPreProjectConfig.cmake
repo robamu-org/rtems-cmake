@@ -35,6 +35,8 @@
 
 function(rtems_pre_project_config RTEMS_PREFIX RTEMS_BSP)
 	
+option(RTEMS_VERBOSE "Additional RTEMS CMake configuration information" FALSE)
+
 if(NOT DEFINED RTEMS_CONFIG_DIR) 
 	message(STATUS 
 		"RTEMS_CONFIG_DIR not set. Assuming  the CMake support was "

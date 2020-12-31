@@ -29,6 +29,8 @@ def main():
                         help="Additional custom defines passed to CMake (suply without -D prefix!)",
                         nargs="*", type=str)
     parser.add_argument("-s", "--sources", type=str, help="Filepath of project sources")
+    parser.add_argument("-v", "--verbose", help="Verbose CMake build configuration",
+                        action="store_true")
 
     args = parser.parse_args()
 
@@ -69,6 +71,10 @@ def main():
         print("Error: RTEMS prefix has to be specified!")
         sys.exit(1)
 
+    rtems_verbose_args = ""
+    if args.verbose:
+        rtems_verbose_args = f"-DRTEMS_VERBOSE=TRUE"
+
     define_string = ""
     if args.defines is not None:
         for define in args.defines:
@@ -95,7 +101,8 @@ def main():
     os.chdir(build_folder)
 
     cmake_command = f"cmake {generator_cmake_arg} -DCMAKE_BUILD_TYPE=\"{cmake_build_type}\" " \
-                    f"{cmake_rtems_bsp} {rtems_prefix_arg} {define_string} {source_location}"
+                    f"{cmake_rtems_bsp} {rtems_prefix_arg} {define_string} {rtems_verbose_args} "\
+                    f"{source_location}"
     # Remove redundant spaces
     cmake_command = ' '.join(cmake_command.split())
     print("Running CMake command: ")
