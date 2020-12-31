@@ -106,7 +106,7 @@ def main():
     # Remove redundant spaces
     cmake_command = ' '.join(cmake_command.split())
     print("Running CMake command: ")
-    print(f"\" {cmake_command} \"")
+    print(f"+ {cmake_command}")
     os.system(cmake_command)
     print("-- CMake configuration done. --")
 
