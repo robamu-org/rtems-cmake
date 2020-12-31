@@ -64,7 +64,7 @@ def main():
         sys.exit(1)
 
     if args.prefix is not None:
-        rtems_prefix = args.prefix
+        rtems_prefix_arg = f"-DRTEMS_PREFIX=\"{args.prefix}\""
     else:
         print("Error: RTEMS prefix has to be specified!")
         sys.exit(1)
@@ -95,7 +95,7 @@ def main():
     os.chdir(build_folder)
 
     cmake_command = f"cmake {generator_cmake_arg} -DCMAKE_BUILD_TYPE=\"{cmake_build_type}\" " \
-                    f"{cmake_rtems_bsp} {rtems_prefix} {define_string} {source_location}"
+                    f"{cmake_rtems_bsp} {rtems_prefix_arg} {define_string} {source_location}"
     # Remove redundant spaces
     cmake_command = ' '.join(cmake_command.split())
     print("Running CMake command: ")

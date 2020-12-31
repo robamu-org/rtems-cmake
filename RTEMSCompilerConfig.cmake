@@ -8,8 +8,8 @@ option(RTEMS_VERBOSE "Verbose output for the RTEMS CMake support" FALSE)
 set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
 set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP")
 
-if(NOT RTEMS_VERSION) 
-	if(NOT ENV{RTEMS_VERSION})
+if(NOT DEFINED RTEMS_VERSION) 
+	if(NOT DEFINED ENV{RTEMS_VERSION})
 		message(WARNING 
 			"No RTEMS verson specified via argument or in"
 			" environment variables!"
