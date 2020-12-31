@@ -8,7 +8,8 @@ The usual way to set up a cross-compile project in CMake is to specify a CMake t
 RTEMS version, RTEMS prefix and the `pkgconfig` utility to set up the RTEMS environment properly so that application developers can focus on their application.
 
 This is still a prototype. Simple applications have been tested, but no larger projects have been compiled with this build support yet.
-The compilation of simple applications was tested on Windows 10 and Ubuntu 20.04
+The compilation of simple applications was tested on Windows 10 and Ubuntu 20.04.
+Improvements, suggestions and pull requests are welcome :-)
 
 ## How to use
 
@@ -67,6 +68,11 @@ The RTEMS CMake build support can be configured either by passing configuration 
  - `RTEMS_TOOLS`: Can be specified if the RTEMS tools folder. Can be different from the prefix but will be equal to the prefix for most users.
  - `RTEMS_PATH`: Folder containing the RTEMS installation (BSPs). Can be different from the prefix but will be equal to the prefix for most users.
 
+## CMake build configuration helper
+
+A small python script is provided in the build support to allow easier configuration of the CMake build systems when using RTEMS. Call `cmake_build_config.py --help` to get 
+some information how to configure a build. Python 3 has to be installed to use this script.
+
 ## Extending the build system support
 
 It is possible to read the pkfconfig files now, so extending the manual build configuration might not be necessary in the future.
@@ -75,7 +81,7 @@ If this becomes necessary after all, follow these steps:
 
 Extract the necessary compiler and linker flags for the RTEMS build from the pkgconfig file for the specific BSP. This file will generally be located inside the `lib/pkgconfig` folder of the RTEMS tools folder. Add these flags manually before the `project` file call (see `RTEMSToolchain.cmake` for examples) for your specific BSP.
 
-## Example
+## Examples
 
 See https://github.com/rmspacefish/rtems-demo/tree/master/applications/hello for an example. This is the Hello World project taken from the RTEMS quick start guide,
-but compiled using RTEMS. The repository also contains instructions on how to build the RTEMS tools if required and all specific steps to build with CMake.
+but compiled using RTEMS. The repository also contains instructions on how to build the RTEMS tools if required and all specific steps to build with CMake and a blinky example for the STM32H743ZI-Nucleo board.
