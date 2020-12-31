@@ -48,8 +48,8 @@ function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 		set(RTEMS_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rtems-cmake)
 	endif()
 	
-	include(${RTEMS_CONFIG_DIR}/RTEMSGeneric.cmake)
-	rtems_generic_config(${TARGET_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP_PAIR} ${ARGN})
+	#include(${RTEMS_CONFIG_DIR}/RTEMSGeneric.cmake)
+	#rtems_generic_config(${TARGET_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP_PAIR} ${ARGN})
 	
 	# Not an ideal solution but it will do for now because the number of 
 	# variables which need to be propagated to the upper most CMakeLists.txt
@@ -57,18 +57,18 @@ function(rtems_general_config TARGET_NAME RTEMS_PREFIX RTEMS_BSP_PAIR)
 	# We could also use CMAKE_TOOLCHAIN_FILE but this way works as well and we 
 	# dont have to supply the file each time, we can set the location in
 	# the uppermost CMakeLists.txt once.
-	set(CMAKE_C_COMPILER ${CMAKE_C_COMPILER} PARENT_SCOPE)
-	set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} PARENT_SCOPE)
-	set(CMAKE_ASM_COMPILER ${CMAKE_ASM_COMPILER} PARENT_SCOPE)
-	set(CMAKE_LINKER ${CMAKE_LINKER} PARENT_SCOPE)
+	#set(CMAKE_C_COMPILER ${CMAKE_C_COMPILER} PARENT_SCOPE)
+	#set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} PARENT_SCOPE)
+	#set(CMAKE_ASM_COMPILER ${CMAKE_ASM_COMPILER} PARENT_SCOPE)
+	#set(CMAKE_LINKER ${CMAKE_LINKER} PARENT_SCOPE)
 
 	# I don't know what this is used for yet, but it might become handy
 	if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
 		set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} PARENT_SCOPE)
 	endif()
 	
-	include(${RTEMS_CONFIG_DIR}/RTEMSHardware.cmake)
-	rtems_hw_config(${TARGET_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP_PAIR} ${ARGN})
+	#include(${RTEMS_CONFIG_DIR}/RTEMSHardware.cmake)
+	#rtems_hw_config(${TARGET_NAME} ${RTEMS_PREFIX} ${RTEMS_BSP_PAIR} ${ARGN})
 
 	# No propagation necessary here because we can use target specific settings.
 
