@@ -1,4 +1,4 @@
-function(rtems_post_project_config)
+function(rtems_post_project_config TARGET_NAME)
 
 if(RTEMS_VERBOSE)
 	message(STATUS "########################################################")
