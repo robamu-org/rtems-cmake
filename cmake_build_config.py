@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""
+@brief  CMake configuration helper
+@details
+This script was written to have a portable way to perform the CMake configuration with various parameters on
+different OSes. It was first written for the Flight Software Framework project.
+
+Run cmake_build_config.py --help to get more information.
+"""
+import os
+import sys
+import argparse
+import shutil
+
+
+def main():
+    print("-- Python CMake build configurator utility --")
+
+    print("Parsing command line arguments..")
+    parser = argparse.ArgumentParser(description="Processing arguments for CMake build configuration.")
+    parser.add_argument("-b", "--buildtype", type=str, choices=["debug", "release", "size", "reldeb"],
+                        help="CMake build type. Valid arguments: debug, release, size, reldeb (Release with Debug "
+                             "Information)", default="debug")
+    parser.add_argument("-l", "--builddir", type=str, help="Specify build directory.")
+    parser.add_argument("-g", "--generator", type=str, help="CMake Generator")
+    parser.add_argument("-p", "--prefix", type=str, help="RTEMS prefix")
+    parser.add_argument("-t", "--target_bsp", type=str, help="RTEMS bsp")
+    parser.add_argument("-d", "--defines",
+                        help="Additional custom defines passed to CMake (without -D prefix)",
+                        nargs="*", type=str)
+    parser.add_argument("-s", "--sources", type=str, help="Filepath of project sources")
+
+    args = parser.parse_args()
+
+    # TODO: make this smarter
+    print("Determining source location..")
+    if args.sources is None:
+        source_location = input("No source location specified. Please supply one: ")
+    else:
+        source_location = args.sources
+
+    print(f"Source location: {source_location}")
+
+    print("Building cmake configuration command..")
+
+    if args.generator is None:
+        generator_cmake_arg = ""
+    else:
+        generator_cmake_arg = f"-G \"{args.generator}\""
+
+    if args.buildtype == "debug":
+        cmake_build_type = "Debug"
+    elif args.buildtype == "release":
+        cmake_build_type = "Release"
+    elif args.buildtype == "size":
+        cmake_build_type = "MinSizeRel"
+    else:
+        cmake_build_type = "RelWithDebInfo"
+
+    if args.target_bsp is not None:
+        cmake_rtems_bsp = f"-DRTEMS_BSP=\"{args.target_bsp}\""
+    else:
+        cmake_rtems_bsp = ""
+
+    define_string = ""
+    if args.defines is not None:
+        for define in args.defines:
+            define_string += f"-D{define} "
+
+    build_folder = cmake_build_type
+    if args.builddir is not None:
+        build_folder = args.builddir
+
+    build_path = source_location + os.path.sep + build_folder
+    if os.path.isdir(build_path):
+        remove_old_dir = input(f"{build_folder} folder already exists. Remove old directory? [y/n]: ")
+        if str(remove_old_dir).lower() in ["yes", "y", 1]:
+            remove_old_dir = True
+        else:
+            build_folder = determine_new_folder()
+            build_path = source_location + os.path.sep + build_folder
+            remove_old_dir = False
+        if remove_old_dir:
+            shutil.rmtree(build_path)
+    os.chdir(source_location)
+    os.mkdir(build_folder)
+    print(f"Navigating into build directory: {build_path}")
+    os.chdir(build_folder)
+
+    cmake_command = f"cmake {generator_cmake_arg} -DCMAKE_BUILD_TYPE=\"{cmake_build_type}\" " \
+                    f"{cmake_rtems_bsp} {define_string} {source_location}"
+    # Remove redundant spaces
+    cmake_command = ' '.join(cmake_command.split())
+    print("Running CMake command: ")
+    print(f"\" {cmake_command} \"")
+    os.system(cmake_command)
+    print("-- CMake configuration done. --")
+
+
+def determine_new_folder() -> str:
+    new_folder = input(f"Use different folder name? [y/n]: ")
+    if str(new_folder).lower() in ["yes", "y", 1]:
+        new_folder_name = input("New folder name: ")
+        return new_folder_name
+    else:
+        print("Aborting configuration.")
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
