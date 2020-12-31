@@ -1,6 +1,6 @@
 # RTEMS CMake Build Support
 
-This repository contains the first version of a possible RTEMS CMake build support. The intention is to provide most CMake configuration to perform cross-compiling of RTEMS applications and provide a decent starting point for developers which would like to build their RTEMS application with CMake. The support has been written as generic as possible and only required a few lines of code is the application `CMakeLists.txt` file and some necessary variables set to determine compiler information.
+This repository contains the first version of a possible RTEMS CMake build support. The intention is to provide most CMake configuration to perform cross-compiling of RTEMS applications and provide a decent starting point for developers which would like to build their RTEMS application with CMake. The support has been written as generic as possible and only requires a few lines of code in the application `CMakeLists.txt` file and some necessary variables set to determine compiler information.
 
 It is assumed that the RTEMS tools and the BSPs have already been built. If you are a beginner and this is not the case, it is recommended to have a look at [this demo](https://github.com/rmspacefish/rtems-demo) or the [QuickStart](https://docs.rtems.org/branches/master/user/start/index.html) to get started with RTEMS.
 
