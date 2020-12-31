@@ -24,9 +24,9 @@ def main():
     parser.add_argument("-l", "--builddir", type=str, help="Specify build directory.")
     parser.add_argument("-g", "--generator", type=str, help="CMake Generator")
     parser.add_argument("-p", "--prefix", type=str, help="RTEMS prefix")
-    parser.add_argument("-t", "--target_bsp", type=str, help="RTEMS bsp")
+    parser.add_argument("-t", "--rtems_bsp", type=str, help="RTEMS BSP")
     parser.add_argument("-d", "--defines",
-                        help="Additional custom defines passed to CMake (without -D prefix)",
+                        help="Additional custom defines passed to CMake (suply without -D prefix!)",
                         nargs="*", type=str)
     parser.add_argument("-s", "--sources", type=str, help="Filepath of project sources")
 
@@ -57,8 +57,8 @@ def main():
     else:
         cmake_build_type = "RelWithDebInfo"
 
-    if args.target_bsp is not None:
-        cmake_rtems_bsp = f"-DRTEMS_BSP=\"{args.target_bsp}\""
+    if args.rtems_bsp is not None:
+        cmake_rtems_bsp = f"-DRTEMS_BSP=\"{args.rtems_bsp}\""
     else:
         cmake_rtems_bsp = ""
 
