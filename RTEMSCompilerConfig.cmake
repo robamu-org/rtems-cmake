@@ -2,7 +2,6 @@ function(rtems_compiler_config RTEMS_PREFIX RTEMS_BSP)
 
 message(STATUS "Setting up and checking RTEMS cross compile configuration..")
 
-
 set(RTEMS_PREFIX ${RTEMS_PREFIX} CACHE FILEPATH "RTEMS prefix")
 set(RTEMS_BSP ${RTEMS_BSP} CACHE STRING "RTEMS BSP")
 
