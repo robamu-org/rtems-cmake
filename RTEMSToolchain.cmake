@@ -19,7 +19,7 @@
 # Finding compilers by using environment variables.
 ###############################################################################
 
-set(CMAKE_CROSSCOMPILING 1)
+set(CMAKE_CROSSCOMPILING TRUE)
 set(CMAKE_SYSTEM_NAME Generic)
 
 if(NOT DEFINED ENV{RTEMS_ARCH_VERSION_NAME})
