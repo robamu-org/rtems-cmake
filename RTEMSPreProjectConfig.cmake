@@ -46,7 +46,7 @@ if(NOT DEFINED RTEMS_CONFIG_DIR)
 endif()
 	
 include(${RTEMS_CONFIG_DIR}/RTEMSCompilerConfig.cmake)
-rtems_compiler_config(RTEMS_PREFIX RTEMS_BSP)
+rtems_compiler_config(${RTEMS_PREFIX} ${RTEMS_BSP})
 
 include(${RTEMS_CONFIG_DIR}/RTEMSPkgConfig.cmake)
 rtems_pkg_config()
