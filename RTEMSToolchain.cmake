@@ -36,7 +36,7 @@ endif()
 
 set(RTEMS_BIN_PATH "$ENV{RTEMS_TOOLS}/bin")
 if(NOT IS_DIRECTORY "${RTEMS_BIN_PATH}")
-	message(FATAL_ERROR "RTEMS binaries folder not found at ${RTEMS_TOOLS}/bin")
+	message(FATAL_ERROR "RTEMS binaries folder not found at ${RTEMS_BIN_PATH}")
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${RTEMS_TOOLS}")
