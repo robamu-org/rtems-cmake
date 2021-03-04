@@ -39,7 +39,7 @@ option(RTEMS_VERBOSE "Additional RTEMS CMake configuration information" FALSE)
 
 if(NOT DEFINED RTEMS_CONFIG_DIR) 
 	message(STATUS 
-		"RTEMS_CONFIG_DIR not set. Assuming  the CMake support was "
+		"RTEMS_CONFIG_DIR not set. Assuming the CMake support was "
 		"cloned in the application source directory.."
 	)
 	set(RTEMS_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/rtems-cmake)
