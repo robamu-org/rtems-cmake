@@ -19,6 +19,12 @@ Clone this repository. This does not necesarilly have to be in the application r
 git clone https://github.com/rmspacefish/rtems-cmake.git
 ```
 
+If you want to add this repository to another repository, add it as a submodule instead
+
+```sh
+git submodule add https://github.com/rmspacefish/rtems-cmake.git
+```
+
 After that, it is recommended to set the path to the RTEMS CMake support with the 
 following line in the application `CMakeLists.txt`
 
