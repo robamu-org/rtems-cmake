@@ -2,9 +2,7 @@
 """
 @brief  CMake configuration helper
 @details
-This script was written to have a portable way to perform the CMake configuration with various parameters on
-different OSes. It was first written for the Flight Software Framework project.
-
+This script was written to have a portable way to perform the CMake configuration with various parameters on different OSes.
 Run cmake_build_config.py --help to get more information.
 """
 import os
@@ -17,20 +15,27 @@ def main():
     print("-- Python CMake build configurator utility --")
 
     print("Parsing command line arguments..")
-    parser = argparse.ArgumentParser(description="Processing arguments for CMake build configuration.")
-    parser.add_argument("-b", "--buildtype", type=str, choices=["debug", "release", "size", "reldeb"],
-                        help="CMake build type. Valid arguments: debug, release, size, reldeb "
-                             "(Release with Debug Information)", default="debug")
+    parser = argparse.ArgumentParser(
+        description="Processing arguments for CMake build configuration."
+    )
+    parser.add_argument(
+        "-b", "--buildtype", type=str, choices=["debug", "release", "size", "reldeb"],
+        help="CMake build type. Valid arguments: debug, release, size, reldeb
+             "(Release with Debug Information)", default="debug"
+    )
     parser.add_argument("-l", "--builddir", type=str, help="Specify build directory.")
     parser.add_argument("-g", "--generator", type=str, help="CMake Generator")
     parser.add_argument("-p", "--prefix", type=str, help="RTEMS prefix")
-    parser.add_argument("-t", "--rtems_bsp", type=str, help="RTEMS BSP")
-    parser.add_argument("-d", "--defines",
-                        help="Additional custom defines passed to CMake (suply without -D prefix!)",
-                        nargs="*", type=str)
+    parser.add_argument("-t", "--rtems-bsp", type=str, help="RTEMS BSP")
+    parser.add_argument(
+        "-d", "--defines",
+        help="Additional custom defines passed to CMake (supply without -D prefix!)",
+        nargs="*", type=str
+    )
     parser.add_argument("-s", "--sources", type=str, help="Filepath of project sources")
-    parser.add_argument("-v", "--verbose", help="Verbose CMake build configuration",
-                        action="store_true")
+    parser.add_argument(
+        "-v", "--verbose", help="Verbose CMake build configuration", action="store_true"
+    )
 
     args = parser.parse_args()
 
@@ -77,7 +82,8 @@ def main():
 
     define_string = ""
     if args.defines is not None:
-        for define in args.defines:
+        define_list = args.defines[0].split()
+        for define in define_list:
             define_string += f"-D{define} "
 
     build_folder = cmake_build_type
@@ -86,7 +92,9 @@ def main():
 
     build_path = source_location + os.path.sep + build_folder
     if os.path.isdir(build_path):
-        remove_old_dir = input(f"{build_folder} folder already exists. Remove old directory? [y/n]: ")
+        remove_old_dir = input(
+            f"{build_folder} folder already exists. Remove old directory? [y/n]: "
+        )
         if str(remove_old_dir).lower() in ["yes", "y", 1]:
             remove_old_dir = True
         else:
@@ -113,3 +121,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
