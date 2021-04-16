@@ -20,7 +20,7 @@ def main():
     )
     parser.add_argument(
         "-b", "--buildtype", type=str, choices=["debug", "release", "size", "reldeb"],
-        help="CMake build type. Valid arguments: debug, release, size, reldeb
+        help="CMake build type. Valid arguments: debug, release, size, reldeb"
              "(Release with Debug Information)", default="debug"
     )
     parser.add_argument("-l", "--builddir", type=str, help="Specify build directory.")
